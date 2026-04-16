@@ -1,0 +1,120 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: smartcall
+      POSTGRES_PASSWORD: smartcall
+      POSTGRES_DB: smartcall
+    # High host port avoids clashes with local/other Postgres on 5432/5433
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartcall -d smartcall"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Runs once before api/worker/beat so tables exist (avoids Celery errors on empty DB).
+  # If a migration failed halfway: docker compose down -v && docker compose up --build
+  migrate:
+    build: .
+    command: alembic upgrade head
+    volumes:
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Investor demo UI (Vite). Set FRONTEND_OAUTH_REDIRECT_URL in .env to http://localhost:5173/oauth/callback
+  demo-ui:
+    image: node:22-alpine
+    working_dir: /srv
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/srv
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: http://localhost:8000
+
+  worker:
+    build: .
+    command: celery -A app.tasks.celery_app worker --loglevel=INFO
+    volumes:
+      - ./app:/app/app
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build: .
+    command: celery -A app.tasks.celery_app beat --loglevel=INFO
+    volumes:
+      - ./app:/app/app
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
