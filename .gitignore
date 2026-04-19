@@ -10,3 +10,9 @@ venv/
 htmlcov/
 frontend/node_modules/
 frontend/dist/
+
+# Google OAuth / local credentials (never commit)
+token.json
+credentials.json
+credentials copy.json
+webapp.json
