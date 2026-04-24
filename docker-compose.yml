@@ -75,8 +75,22 @@ services:
     volumes:
       - ./frontend:/srv
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    env_file:
+      - ./frontend/.env.local
     environment:
       VITE_API_URL: http://localhost:8000
+
+  voice-agent:
+    build: ./voice_agent/care
+    command: uv run src/agent.py start
+    env_file:
+      - .env
+    environment:
+      # Ensure LiveKit URL is reachable from the container
+      LIVEKIT_URL: ${LIVEKIT_URL:-wss://livekit.genaiforge.in}
+    depends_on:
+      redis:
+        condition: service_healthy
 
   worker:
     build: .

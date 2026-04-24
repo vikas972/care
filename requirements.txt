@@ -16,6 +16,8 @@ google-auth-oauthlib>=1.2.1
 google-auth>=2.36.0
 twilio>=9.0.0
 livekit-agents
+livekit-api>=1.0.0
+firebase-admin>=6.6.0
 python-dotenv>=1.0.1
 google-genai>=1.73.1
 openai-whisper>=20250625

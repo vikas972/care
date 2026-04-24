@@ -311,6 +311,17 @@ export default function Dashboard() {
           <p className="text-slate-400 text-sm mb-6">
             API base: <code className="text-emerald-400/90">{getApiBase()}</code>
           </p>
+          <div className="mb-6">
+            <Link
+              to="/voice"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-medium hover:bg-white/15"
+            >
+              Open Voice Agent UI →
+            </Link>
+            <p className="text-xs text-slate-500 mt-2">
+              Join a LiveKit room, publish your mic, and talk to the agent.
+            </p>
+          </div>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <p className="text-sm text-slate-500 mb-1">Name</p>

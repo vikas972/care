@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     twilio_webhook_public_url: str = ""
     twilio_validate_webhook_signatures: bool = True
 
+    # LiveKit (for browser voice UI tokens)
+    livekit_url: str = ""
+    livekit_api_key: str = ""
+    livekit_api_secret: str = ""
+
+    # Firebase (phone OTP login)
+    # Path to a Firebase service account JSON file. Required for verifying Firebase ID tokens.
+    firebase_service_account_file: str = ""
+
     calendar_reminder_minutes_before: int = 15
     # Number of retry attempts after the initial call. 1 => at most 2 total calls.
     call_retry_max: int = 1

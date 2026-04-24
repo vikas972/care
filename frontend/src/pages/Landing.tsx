@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getToken, loginUrl } from "../api";
+import { getToken } from "../api";
 
 export default function Landing() {
   const loggedIn = !!getToken();
@@ -41,12 +41,12 @@ export default function Landing() {
               Go to dashboard
             </Link>
           ) : (
-            <a
-              href={loginUrl()}
+            <Link
+              to="/login"
               className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white text-ink-950 font-semibold hover:bg-slate-200 transition-colors"
             >
-              Sign in with Google
-            </a>
+              Sign in with phone (OTP)
+            </Link>
           )}
           <a
             href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/docs`}
@@ -84,16 +84,9 @@ export default function Landing() {
         </div>
 
         <p className="mt-14 text-sm text-slate-500 max-w-xl">
-          Configure <code className="text-slate-400">FRONTEND_OAUTH_REDIRECT_URL</code> on the API to
-          this app&apos;s <code className="text-slate-400">/oauth/callback</code> after the API
-          handles Google at{" "}
-          <code className="text-slate-400">http://localhost:8000/auth/google/callback</code>. If
-          Google sends you to <code className="text-slate-400">http://localhost/?code=…</code>{" "}
-          (port 80), you are using the wrong OAuth client type or redirect URI in Google Console—use
-          a <strong className="text-slate-400 font-semibold">Web application</strong> client with
-          that exact callback URL, not the Desktop client used by <code className="text-slate-400">calander.py</code>.
-          Check <code className="text-slate-400">GET /auth/google/oauth-env</code> for the redirect
-          URI this API is actually using.
+          Phone login uses Firebase OTP. Configure the demo UI with{" "}
+          <code className="text-slate-400">VITE_FIREBASE_*</code> env vars and configure the API with{" "}
+          <code className="text-slate-400">FIREBASE_SERVICE_ACCOUNT_FILE</code>.
         </p>
       </main>
     </div>

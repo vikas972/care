@@ -6,7 +6,18 @@ from urllib.parse import urlparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, calendar, calls, health, medicine, users, webhooks_exotel, webhooks_twilio
+from app.api import (
+    auth,
+    auth_phone,
+    calendar,
+    calls,
+    health,
+    livekit,
+    medicine,
+    users,
+    webhooks_exotel,
+    webhooks_twilio,
+)
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -88,9 +99,11 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(auth_phone.router)
 app.include_router(users.router)
 app.include_router(calendar.router)
 app.include_router(medicine.router)
 app.include_router(calls.router)
+app.include_router(livekit.router)
 app.include_router(webhooks_exotel.router)
 app.include_router(webhooks_twilio.router)
