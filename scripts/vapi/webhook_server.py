@@ -1,9 +1,21 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+"""Standalone FastAPI app for Vapi webhooks (tool calls + call transcripts).
+
+Run locally::
+
+    cd scripts/vapi && uvicorn webhook_server:app --reload --host 0.0.0.0 --port 8010
+
+Written transcripts live under ``reports/`` next to this file (gitignored).
+"""
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+_REPORTS_DIR = Path(__file__).resolve().parent / "reports"
 
 app = FastAPI()
 
@@ -27,7 +39,7 @@ async def vapi_webhook(request: Request):
         artifact = call.get("artifact", {})
         transcript = artifact.get("transcript")
         analysis = call.get("analysis")
-        reports_dir = Path("vapi_reports")
+        reports_dir = _REPORTS_DIR
         reports_dir.mkdir(parents=True, exist_ok=True)
 
         call_id = call.get("id") or call.get("callId") or call.get("sid") or str(uuid4())

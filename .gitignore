@@ -20,3 +20,8 @@ credentials copy.json
 webapp.json
 firebase_sa.json
 AI Voice Agent Solution – Requirement Questionnaire.docx
+
+# Local webhook output / secrets — never commit
+scripts/vapi/reports/
+twilio_*recovery*.txt
+*_recovery_code*.txt
