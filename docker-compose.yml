@@ -89,7 +89,7 @@ services:
       VITE_API_URL: http://localhost:8000
 
   voice-agent:
-    build: ./agents/livekit-worker
+    build: ./voice_agent/care
     command: uv run src/agent.py start
     env_file:
       - .env

@@ -9,9 +9,9 @@ FastAPI backend, React demo UI, Celery reminders, and LiveKit voice agents.
 | `app/` | Production FastAPI API (`uvicorn app.main:app`) |
 | `alembic/` | Database migrations |
 | `frontend/` | Vite + React dashboard (`npm run dev`) |
-| `agents/livekit-worker/` | LiveKit agent Docker image used by Compose (`voice-agent` service) |
-| `agents/livekit-agent-template/` | Separate LiveKit starter / experiments |
-| `agents/playground/` | Optional local Whisper + Gemini experiments (`voice.py`, `ui.py`) |
+| `voice_agent/care/` | LiveKit agent Docker image used by Compose (`voice-agent` service) |
+| `voice_agent/my-agent/` | Separate LiveKit starter / experiments |
+| `voice_agent/` | Optional local Whisper + Gemini experiments (`voice.py`, `ui.py`) |
 | `scripts/` | One-off tooling (Postgres bootstrap, Vapi helpers, Calendar samples) |
 | `scripts/vapi/` | `webhook_server.py`, `outbound_call.py` (not wired into main API) |
 | `scripts/google_calendar/` | Google Calendar API scratch scripts |
