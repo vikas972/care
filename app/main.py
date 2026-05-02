@@ -3,8 +3,9 @@ import re
 from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import (
     auth,
@@ -96,6 +97,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # Keep this conservative in non-local deploys, but on localhost the extra detail
+    # makes misconfig (especially DATABASE_URL) obvious without spelunking server logs.
+    base = (get_settings().app_base_url or "").lower()
+    is_local = "localhost" in base or "127.0.0.1" in base
+    detail = f"{type(exc).__name__}: {exc}" if is_local else "Internal server error"
+    logger.exception("Unhandled error", exc_info=exc)
+    return JSONResponse(status_code=500, content={"detail": detail})
+
 
 app.include_router(health.router)
 app.include_router(auth.router)

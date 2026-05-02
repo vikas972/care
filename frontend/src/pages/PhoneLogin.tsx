@@ -4,6 +4,18 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { api, setToken } from "../api";
 import { auth } from "../firebase";
 
+function describeFirebaseError(e: unknown): string {
+  const anyE = e as any;
+  const code = typeof anyE?.code === "string" ? anyE.code : null;
+  const msg =
+    typeof anyE?.message === "string"
+      ? anyE.message
+      : e instanceof Error
+        ? e.message
+        : "Unknown error";
+  return code ? `${code}: ${msg}` : msg;
+}
+
 export default function PhoneLogin() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
@@ -25,6 +37,7 @@ export default function PhoneLogin() {
 
     setBusy(true);
     try {
+      console.info("[otp] sending", { phone: phone.trim() });
       if (!verifierRef.current) {
         verifierRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
@@ -32,9 +45,12 @@ export default function PhoneLogin() {
       }
       const confirmation = await signInWithPhoneNumber(auth, phone.trim(), verifierRef.current);
       confirmationRef.current = confirmation;
+      console.info("[otp] sent");
       setPhase("code");
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to send OTP");
+      const d = describeFirebaseError(e);
+      console.error("[otp] send failed", e);
+      setErr(`OTP not sent: ${d}`);
     } finally {
       setBusy(false);
     }
@@ -47,10 +63,12 @@ export default function PhoneLogin() {
 
     setBusy(true);
     try {
+      console.info("[otp] verifying");
       const confirmation = confirmationRef.current;
       if (!confirmation) throw new Error("No OTP request in progress. Please resend.");
       const cred = await confirmation.confirm(code.trim());
       const idToken = await cred.user.getIdToken();
+      console.info("[otp] verified, exchanging token with API");
 
       const r = await api<{ access_token: string }>("/auth/phone/exchange", {
         method: "POST",
@@ -61,7 +79,9 @@ export default function PhoneLogin() {
       setToken(r.access_token);
       navigate("/dashboard", { replace: true });
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to verify OTP");
+      const d = describeFirebaseError(e);
+      console.error("[otp] verify failed", e);
+      setErr(d);
     } finally {
       setBusy(false);
     }

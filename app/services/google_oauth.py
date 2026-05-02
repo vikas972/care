@@ -37,8 +37,8 @@ def build_oauth_flow(state: str | None = None) -> Flow:
     return flow
 
 
-def authorization_url() -> tuple[str, str]:
-    flow = build_oauth_flow()
+def authorization_url(*, state: str | None = None) -> tuple[str, str]:
+    flow = build_oauth_flow(state=state)
     url, state = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",

@@ -1,9 +1,9 @@
-import os
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from app.config import get_settings
 from app.database import Base
 from app.models import CalendarEvent, CallLog, MedicineReminder, User  # noqa: F401
 
@@ -15,7 +15,8 @@ target_metadata = Base.metadata
 
 
 def get_url() -> str:
-    return os.environ.get("DATABASE_URL", "postgresql+psycopg2://smartcall:smartcall@localhost:5432/smartcall")
+    # Same as the FastAPI app (reads `.env` via pydantic-settings).
+    return get_settings().database_url
 
 
 def run_migrations_offline() -> None:

@@ -15,7 +15,8 @@ function Protected({ children }: { children: ReactNode }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<PhoneLogin />} />
+      <Route path="/welcome" element={<Landing />} />
       <Route path="/oauth/callback" element={<OAuthCallback />} />
       <Route path="/login" element={<PhoneLogin />} />
       <Route

@@ -34,10 +34,15 @@ services:
     volumes:
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
+      # Firebase Admin SDK service account (for OTP token verification)
+      # Create this file locally and keep it out of git:
+      #   ./secrets/firebase-service-account.json
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
+      FIREBASE_SERVICE_ACCOUNT_FILE: /run/secrets/firebase-service-account.json
     depends_on:
       postgres:
         condition: service_healthy
@@ -49,6 +54,8 @@ services:
       - ./app:/app/app
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
+      # Firebase Admin SDK service account (for OTP token verification)
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     ports:
       - "8000:8000"
     env_file:
@@ -58,6 +65,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      FIREBASE_SERVICE_ACCOUNT_FILE: /run/secrets/firebase-service-account.json
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -97,12 +105,14 @@ services:
     command: celery -A app.tasks.celery_app worker --loglevel=INFO
     volumes:
       - ./app:/app/app
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      FIREBASE_SERVICE_ACCOUNT_FILE: /run/secrets/firebase-service-account.json
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -116,12 +126,14 @@ services:
     command: celery -A app.tasks.celery_app beat --loglevel=INFO
     volumes:
       - ./app:/app/app
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+psycopg2://smartcall:smartcall@postgres:5432/smartcall
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      FIREBASE_SERVICE_ACCOUNT_FILE: /run/secrets/firebase-service-account.json
     depends_on:
       migrate:
         condition: service_completed_successfully

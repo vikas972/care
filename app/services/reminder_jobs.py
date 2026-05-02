@@ -20,15 +20,19 @@ def schedule_calendar_reminder(event: CalendarEvent) -> None:
         event.celery_task_id = None
         return
     now = datetime.now(UTC)
-    if event.reminder_time <= now:
-        res = celery_app.send_task("place_calendar_reminder", args=[event.id])
-    else:
-        res = celery_app.send_task(
-            "place_calendar_reminder",
-            args=[event.id],
-            eta=event.reminder_time,
-        )
-    event.celery_task_id = res.id
+    try:
+        if event.reminder_time <= now:
+            res = celery_app.send_task("place_calendar_reminder", args=[event.id])
+        else:
+            res = celery_app.send_task(
+                "place_calendar_reminder",
+                args=[event.id],
+                eta=event.reminder_time,
+            )
+        event.celery_task_id = res.id
+    except Exception:
+        # Local dev often runs the API without Redis/Celery; keep the API request working.
+        event.celery_task_id = None
 
 
 def schedule_medicine_reminder(m: MedicineReminder) -> None:
@@ -37,15 +41,19 @@ def schedule_medicine_reminder(m: MedicineReminder) -> None:
         m.celery_task_id = None
         return
     now = datetime.now(UTC)
-    if m.next_fire_at <= now:
-        res = celery_app.send_task("place_medicine_reminder", args=[m.id])
-    else:
-        res = celery_app.send_task(
-            "place_medicine_reminder",
-            args=[m.id],
-            eta=m.next_fire_at,
-        )
-    m.celery_task_id = res.id
+    try:
+        if m.next_fire_at <= now:
+            res = celery_app.send_task("place_medicine_reminder", args=[m.id])
+        else:
+            res = celery_app.send_task(
+                "place_medicine_reminder",
+                args=[m.id],
+                eta=m.next_fire_at,
+            )
+        m.celery_task_id = res.id
+    except Exception:
+        # Local dev often runs the API without Redis/Celery; keep the API request working.
+        m.celery_task_id = None
 
 
 def schedule_pending_calendar_for_user(db, user_id: int) -> None:

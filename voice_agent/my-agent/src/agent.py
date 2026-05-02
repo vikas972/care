@@ -1,3 +1,4 @@
+import json
 import logging
 
 from dotenv import load_dotenv
@@ -17,35 +18,29 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
+load_dotenv(".env")
 
-AGENT_MODEL = "openai/gpt-5.3-chat-latest"
+# Faster default for voice latency (swap if you need stronger reasoning).
+AGENT_MODEL = "openai/gpt-4.1-mini"
+
+# Default outbound phone flow: short hello first, then substance (see _run_outbound_opening).
+OUTBOUND_GREETING = (
+    "Hi Gaurav, I am Vikas's AI assistant. Hope this is a good time."
+)
+OUTBOUND_BODY = (
+    "Quick question, are you free today for a meeting? "
+    "Would you rather meet in person or online?"
+    "What time today works best for you?"
+)
 
 
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions="""You are a helpful voice AI assistant. The user is interacting with you via voice, even if you perceive the conversation as text.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-            You are curious, friendly, and have a sense of humor.""",
-        )
+            instructions="""You are Vikas's AI assistant on a phone call. Short plain sentences. No emojis or markdown.
 
-    # To add tools, use the @function_tool decorator.
-    # Here's an example that adds a simple weather tool.
-    # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
-    # @function_tool
-    # async def lookup_weather(self, context: RunContext, location: str):
-    #     """Use this tool to look up current weather information in the given location.
-    #
-    #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
-    #
-    #     Args:
-    #         location: The location to look up weather information for (e.g. city name)
-    #     """
-    #
-    #     logger.info(f"Looking up weather for {location}")
-    #
-    #     return "sunny with a temperature of 70 degrees."
+            After the opening, listen and reply briefly and naturally""",
+        )
 
 
 server = AgentServer()
@@ -58,55 +53,73 @@ def prewarm(proc: JobProcess):
 server.setup_fnc = prewarm
 
 
+async def _run_outbound_opening(session: AgentSession, payload: dict) -> None:
+    if payload.get("skip_opening"):
+        return
+
+    custom = str(payload.get("opening_script") or "").strip()
+    two_step = payload.get("two_step", True)
+
+    if custom and not two_step:
+        session.generate_reply(
+            instructions=(
+                "The callee just answered. Speak in a natural phone-call tone, not like reading a document. "
+                "Keep a friendly pace. One flow, a few short sentences.\n\n"
+                + custom
+            ),
+            allow_interruptions=True,
+        )
+        return
+
+    if not two_step and not custom:
+        session.generate_reply(
+            instructions=(
+                "The callee just answered. Natural phone-call tone, one short flow, not like reading a list.\n\n"
+                + OUTBOUND_GREETING
+                + " "
+                + OUTBOUND_BODY
+            ),
+            allow_interruptions=True,
+        )
+        return
+
+    body = custom if custom else OUTBOUND_BODY
+
+    h = session.generate_reply(
+        instructions=(
+            "The callee just answered. Say ONLY this as the very first thing, warm and brief, nothing else: "
+            + OUTBOUND_GREETING
+        ),
+        allow_interruptions=False,
+    )
+    await h.wait_for_playout()
+    session.generate_reply(
+        instructions=(
+            "Continue like a normal phone call. Do not repeat the greeting. "
+            "Sound conversational, not like reading bullet points. Two or three short sentences max.\n\n"
+            + body
+        ),
+        allow_interruptions=True,
+    )
+
+
 @server.rtc_session(agent_name="my-agent")
 async def my_agent(ctx: JobContext):
-    # Logging setup
-    # Add any other context you want in all log entries here
     ctx.log_context_fields = {
         "room": ctx.room.name,
     }
 
-    # Set up a voice AI pipeline using OpenAI, Cartesia, Deepgram, and the LiveKit turn detector
     session = AgentSession(
-        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
-        # See all available models at https://docs.livekit.io/agents/models/stt/
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
-        # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
-        # See all available models at https://docs.livekit.io/agents/models/llm/
         llm=inference.LLM(model=AGENT_MODEL),
-        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
-        # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=inference.TTS(
             model="cartesia/sonic-3", voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
         ),
-        # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
-        # See more at https://docs.livekit.io/agents/build/turns
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
-        # allow the LLM to generate a response while waiting for the end of turn
-        # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
         preemptive_generation=True,
     )
 
-    # To use a realtime model instead of a voice pipeline, use the following session setup instead.
-    # (Note: This is for the OpenAI Realtime API. For other providers, see https://docs.livekit.io/agents/models/realtime/))
-    # 1. Install livekit-agents[openai]
-    # 2. Set OPENAI_API_KEY in .env.local
-    # 3. Add `from livekit.plugins import openai` to the top of this file
-    # 4. Use the following session setup instead of the version above
-    # session = AgentSession(
-    #     llm=openai.realtime.RealtimeModel(voice="marin")
-    # )
-
-    # # Add a virtual avatar to the session, if desired
-    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
-    # avatar = hedra.AvatarSession(
-    #   avatar_id="...",  # See https://docs.livekit.io/agents/models/avatar/plugins/hedra
-    # )
-    # # Start the avatar and wait for it to join
-    # await avatar.start(session, room=ctx.room)
-
-    # Start the session, which initializes the voice pipeline and warms up the models
     await session.start(
         agent=Assistant(),
         room=ctx.room,
@@ -119,8 +132,29 @@ async def my_agent(ctx: JobContext):
         ),
     )
 
-    # Join the room and connect to the user
     await ctx.connect()
+
+    md = (ctx.job.metadata or "").strip()
+    payload: dict = {}
+    if md:
+        try:
+            payload = json.loads(md)
+        except json.JSONDecodeError:
+            payload = {"opening_script": md}
+
+    user_name = str(payload.get("user_name") or "").strip()
+    opening_question = str(payload.get("opening_question") or "").strip()
+    if not payload.get("opening_script") and (user_name or opening_question):
+        parts: list[str] = []
+        if user_name:
+            parts.append(f"Hi {user_name}.")
+        if opening_question:
+            parts.append(opening_question)
+        parts.append("What time today works best for you?")
+        payload["opening_script"] = " ".join(p for p in parts if p).strip()
+        payload.setdefault("two_step", False)
+
+    await _run_outbound_opening(session, payload)
 
 
 if __name__ == "__main__":

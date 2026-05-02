@@ -6,11 +6,16 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
+from app.deps import get_current_user
 from app.models.user import User
 from app.schemas.auth import TokenResponse
 from app.services.crypto import encrypt_str
 from app.services.google_oauth import authorization_url, exchange_code, userinfo_from_flow
-from app.services.jwt_utils import create_access_token
+from app.services.jwt_utils import (
+    create_access_token,
+    create_google_link_state,
+    decode_google_link_state,
+)
 
 router = APIRouter(prefix="/auth/google", tags=["auth"])
 
@@ -25,6 +30,14 @@ def google_login():
 def google_auth_url():
     """Return authorization URL for SPA or API clients."""
     url, state = authorization_url()
+    return {"authorization_url": url, "state": state}
+
+
+@router.get("/link-url")
+def google_link_url(user: User = Depends(get_current_user)):
+    """Google OAuth URL that links calendar access to the *current* user."""
+    state = create_google_link_state(user.id)
+    url, _ = authorization_url(state=state)
     return {"authorization_url": url, "state": state}
 
 
@@ -74,19 +87,35 @@ def google_callback(
             return _redirect_frontend(fe, error=msg)
         raise HTTPException(400, msg)
 
-    user = db.query(User).filter(User.google_sub == sub).one_or_none()
-    if user:
+    link_user_id = decode_google_link_state(state or "") if state else None
+    if link_user_id is not None:
+        # Link Google Calendar to an existing (OTP) user
+        user = db.get(User, link_user_id)
+        if not user:
+            raise HTTPException(400, "Link state user not found")
+        # Prevent linking same Google account to multiple users
+        existing = db.query(User).filter(User.google_sub == sub).one_or_none()
+        if existing and existing.id != user.id:
+            raise HTTPException(409, "This Google account is already linked to another user.")
         user.email = email
         user.name = name
+        user.google_sub = sub
         user.google_refresh_token_encrypted = encrypt_str(creds.refresh_token)
     else:
-        user = User(
-            email=email,
-            name=name,
-            google_sub=sub,
-            google_refresh_token_encrypted=encrypt_str(creds.refresh_token),
-        )
-        db.add(user)
+        # Normal Google sign-in (creates or updates a Google user)
+        user = db.query(User).filter(User.google_sub == sub).one_or_none()
+        if user:
+            user.email = email
+            user.name = name
+            user.google_refresh_token_encrypted = encrypt_str(creds.refresh_token)
+        else:
+            user = User(
+                email=email,
+                name=name,
+                google_sub=sub,
+                google_refresh_token_encrypted=encrypt_str(creds.refresh_token),
+            )
+            db.add(user)
     db.commit()
     db.refresh(user)
 

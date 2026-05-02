@@ -382,6 +382,12 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <a
+                href={`${getApiBase()}/auth/google/login`}
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-2.5 text-sm"
+              >
+                Connect Google Calendar
+              </a>
               <button
                 type="button"
                 onClick={() => void checkCalendarConnection()}

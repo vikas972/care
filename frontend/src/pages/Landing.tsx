@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getToken } from "../api";
+import { getToken, loginUrl } from "../api";
 
 export default function Landing() {
   const loggedIn = !!getToken();
@@ -41,12 +41,20 @@ export default function Landing() {
               Go to dashboard
             </Link>
           ) : (
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white text-ink-950 font-semibold hover:bg-slate-200 transition-colors"
-            >
-              Sign in with phone (OTP)
-            </Link>
+            <>
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white text-ink-950 font-semibold hover:bg-slate-200 transition-colors"
+              >
+                Sign in with phone (OTP)
+              </Link>
+              <a
+                href={loginUrl()}
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-600 text-slate-300 font-medium hover:border-slate-500 transition-colors"
+              >
+                Sign in with Google (Calendar)
+              </a>
+            </>
           )}
           <a
             href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/docs`}

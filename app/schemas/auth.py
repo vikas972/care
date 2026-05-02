@@ -8,7 +8,7 @@ class TokenResponse(BaseModel):
 
 class UserPublic(BaseModel):
     id: int
-    email: str
+    email: str | None
     name: str | None
     has_phone: bool
     call_provider: str = "exotel"

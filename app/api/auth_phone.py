@@ -29,20 +29,16 @@ def exchange_firebase_phone_token(body: FirebaseExchangeIn, db: Session = Depend
     if not uid or not phone:
         raise HTTPException(400, "Firebase token missing uid/phone_number (phone auth required).")
 
-    # NOTE: This project currently requires `email` and `google_sub` to be non-null/unique.
-    # We store Firebase users in those columns to avoid a DB migration.
-    sub = f"firebase:{uid}"
-    email = f"{uid}@phone.local"
-
-    user = db.query(User).filter(User.google_sub == sub).one_or_none()
+    user = db.query(User).filter(User.firebase_uid == uid).one_or_none()
     if user:
-        user.email = email
+        user.firebase_uid = uid
         user.phone_number_encrypted = encrypt_str(phone)
     else:
         user = User(
-            email=email,
+            email=None,
             name=None,
-            google_sub=sub,
+            google_sub=None,
+            firebase_uid=uid,
             phone_number_encrypted=encrypt_str(phone),
             google_refresh_token_encrypted=None,
         )

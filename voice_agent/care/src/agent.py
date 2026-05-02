@@ -10,41 +10,29 @@ from livekit.agents import (
     cli,
     room_io,
 )
-from livekit.plugins import ai_coustics, deepgram, google, silero
+from livekit.plugins import deepgram, google, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
+load_dotenv(".env")
 
-AGENT_MODEL = "gemini-2.5-flash"
+# Use gemini-2.0-flash for lower latency; if your project rejects it, use gemini-2.5-flash.
+AGENT_MODEL = "gemini-2.0-flash"
 
 
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions="""You are a helpful voice AI assistant. The user is interacting with you via voice, even if you perceive the conversation as text.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-            You are curious, friendly, and have a sense of humor.""",
-        )
+            instructions="""You are Vikas's AI assistant. Replies must be short for voice.
+            When you first greet someone, briefly say you are Vikas's AI assistant.
 
-    # To add tools, use the @function_tool decorator.
-    # Here's an example that adds a simple weather tool.
-    # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
-    # @function_tool
-    # async def lookup_weather(self, context: RunContext, location: str):
-    #     """Use this tool to look up current weather information in the given location.
-    #
-    #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
-    #
-    #     Args:
-    #         location: The location to look up weather information for (e.g. city name)
-    #     """
-    #
-    #     logger.info(f"Looking up weather for {location}")
-    #
-    #     return "sunny with a temperature of 70 degrees."
+            Language: If the user speaks Hindi, answer mainly in Hindi with simple, natural spoken phrasing.
+            If they speak English, answer in English. If they mix Hinglish, follow their lead. Ask once which they prefer if unclear.
+
+            No emojis, bullets, asterisks, or markdown.""",
+        )
 
 
 server = AgentServer()
@@ -59,66 +47,38 @@ server.setup_fnc = prewarm
 
 @server.rtc_session(agent_name="care")
 async def my_agent(ctx: JobContext):
-    # Logging setup
-    # Add any other context you want in all log entries here
     ctx.log_context_fields = {
         "room": ctx.room.name,
     }
 
-    # Set up a voice AI pipeline using Deepgram STT + Gemini LLM + Gemini TTS
+    # Latency: multi STT for Hindi+English, flash LLM, no extra NC plugin on input path.
     session = AgentSession(
-        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
-        # See all available models at https://docs.livekit.io/agents/models/stt/
-        stt=deepgram.STT(model="nova-3", language="en-US"),
-        # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
-        # See all available models at https://docs.livekit.io/agents/models/llm/
+        stt=deepgram.STT(model="nova-3", language="multi"),
         llm=google.LLM(model=AGENT_MODEL),
-        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
-        # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=google.beta.GeminiTTS(
             model="gemini-2.5-flash-preview-tts",
             voice_name="Kore",
         ),
-        # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
-        # See more at https://docs.livekit.io/agents/build/turns
         turn_detection=MultilingualModel(),
         turn_handling={
             "interruption": {
-                # Avoid LiveKit Cloud "adaptive interruption" (barge-in) calls.
                 "mode": "vad",
             }
         },
         vad=ctx.proc.userdata["vad"],
-        # allow the LLM to generate a response while waiting for the end of turn
-        # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
         preemptive_generation=True,
     )
 
-    # To use a realtime model instead of a voice pipeline, see
-    # https://docs.livekit.io/agents/models/realtime/plugins/gemini/
-
-    # # Add a virtual avatar to the session, if desired
-    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
-    # avatar = hedra.AvatarSession(
-    #   avatar_id="...",  # See https://docs.livekit.io/agents/models/avatar/plugins/hedra
-    # )
-    # # Start the avatar and wait for it to join
-    # await avatar.start(session, room=ctx.room)
-
-    # Start the session, which initializes the voice pipeline and warms up the models
     await session.start(
         agent=Assistant(),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
-                noise_cancellation=ai_coustics.audio_enhancement(
-                    model=ai_coustics.EnhancerModel.QUAIL_VF_L
-                ),
+                noise_cancellation=None,
             ),
         ),
     )
 
-    # Join the room and connect to the user
     await ctx.connect()
 
 
