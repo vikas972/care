@@ -10,7 +10,7 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
-frontend/node_modules/
+node_modules/
 frontend/dist/
 
 # Google OAuth / local credentials (never commit)
