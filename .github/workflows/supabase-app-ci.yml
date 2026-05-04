@@ -1,0 +1,58 @@
+name: Supabase app CI
+
+on:
+  push:
+    branches: [supabase_Bass]
+    paths:
+      - "supabase_app/**"
+      - ".github/workflows/supabase-app-ci.yml"
+  pull_request:
+    branches: [supabase_Bass]
+    paths:
+      - "supabase_app/**"
+      - ".github/workflows/supabase-app-ci.yml"
+
+concurrency:
+  group: supabase-app-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (TypeScript + Vite build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase_app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: supabase_app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend (Python install + compile check)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase_app/supabase/backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Byte-compile application packages
+        run: python -m compileall voice_bff make_call.py

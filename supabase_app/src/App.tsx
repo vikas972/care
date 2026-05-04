@@ -59,7 +59,8 @@ export default function App() {
         <Route path="/studio" element={<StudioLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="agents" element={<AgentsList />} />
-          <Route path="agents/new" element={<AgentEditor />} />
+          {/* Use a single dynamic route so /studio/agents/new sets agentId="new" in useParams(). A separate
+              path="agents/new" matched first but exposed no params, leaving AgentEditor stuck on "Loading agent…". */}
           <Route path="agents/:agentId" element={<AgentEditor />} />
           <Route path="demo" element={<VoiceDemoPage />} />
           <Route path="outbound" element={<OutboundPage />} />
