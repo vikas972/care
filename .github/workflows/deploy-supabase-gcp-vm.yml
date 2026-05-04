@@ -38,13 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install rsync (runner dependency)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y rsync
-          command -v rsync
-          rsync --version | head -n 2
-
       - name: Write compose build variables (frontend build-args)
         working-directory: supabase_app/deploy
         env:
@@ -73,25 +66,24 @@ jobs:
           chmod 600 ~/.ssh/gcp_deploy
           ssh-keyscan -H "$GCP_VM_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-          RSYNC_RSH="ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
-          REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}:supabase_app/"
+          SSH="ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}"
 
-          rsync -az --delete \
-            --filter='protect deploy/backend.env' \
-            --exclude node_modules \
-            --exclude dist \
-            --exclude .venv \
-            --exclude .git \
-            --exclude '.env' \
-            --exclude '.env.local' \
-            --exclude 'supabase/backend/.env' \
-            --exclude 'deploy/backend.env' \
-            -e "$RSYNC_RSH" \
-            supabase_app/ "$REMOTE"
+          # Ship the app as a tar stream to avoid requiring rsync on the runner.
+          # We explicitly exclude secrets and build artifacts; the VM keeps deploy/backend.env.
+          tar -czf - \
+            --exclude 'supabase_app/node_modules' \
+            --exclude 'supabase_app/dist' \
+            --exclude 'supabase_app/.env' \
+            --exclude 'supabase_app/.env.local' \
+            --exclude 'supabase_app/supabase/backend/.env' \
+            --exclude 'supabase_app/deploy/backend.env' \
+            --exclude 'supabase_app/supabase/backend/.venv' \
+            --exclude 'supabase_app/supabase/backend/__pycache__' \
+            supabase_app \
+            | $SSH "$REMOTE" "mkdir -p ~/supabase_app && tar -xzf - -C ~"
 
-          ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
-            "${GCP_VM_USER}@${GCP_VM_HOST}" \
-            "set -euo pipefail
-            cd ~/supabase_app/deploy
-            docker compose --env-file .deploy-build.env up -d --build
-            rm -f .deploy-build.env"
+          $SSH "$REMOTE" "set -euo pipefail
+          cd ~/supabase_app/deploy
+          docker compose --env-file .deploy-build.env up -d --build
+          rm -f .deploy-build.env"
