@@ -42,6 +42,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rsync
+          command -v rsync
+          rsync --version | head -n 2
 
       - name: Write compose build variables (frontend build-args)
         working-directory: supabase_app/deploy
