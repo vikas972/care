@@ -147,6 +147,14 @@ export default function VoiceDemoPage() {
     setErr(null);
     const room = roomRef.current;
     if (!room) return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setErr(
+        window.isSecureContext
+          ? "This browser does not expose the microphone API (getUserMedia)."
+          : "Microphone needs a secure context: use HTTPS (or localhost). Plain http:// on a public host blocks getUserMedia — add TLS (e.g. Let’s Encrypt with nginx).",
+      );
+      return;
+    }
     try {
       const track = await createLocalAudioTrack({
         echoCancellation: true,
