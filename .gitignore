@@ -12,6 +12,7 @@ venv/
 htmlcov/
 node_modules/
 frontend/dist/
+supabase_app/dist/
 
 # Google OAuth / local credentials (never commit)
 token.json

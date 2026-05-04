@@ -22,6 +22,24 @@ load_dotenv(".env")
 
 # Faster default for voice latency (swap if you need stronger reasoning).
 AGENT_MODEL = "openai/gpt-4.1-mini"
+DEFAULT_STT_MODEL = "deepgram/nova-3"
+DEFAULT_STT_LANGUAGE = "multi"
+DEFAULT_TTS_MODEL = "cartesia/sonic-3"
+DEFAULT_TTS_VOICE = "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+
+DEFAULT_INSTRUCTIONS = """You are Vikas's AI assistant on a phone call. Short plain sentences. No emojis or markdown.
+
+After the opening, listen and reply briefly and naturally"""
+
+
+def inference_models_from_job_payload(payload: dict) -> tuple[str, str, str, str]:
+    """Return (stt_model, llm_model, tts_model, tts_voice) from dispatch metadata."""
+    stt = str(payload.get("stt_model") or DEFAULT_STT_MODEL).strip() or DEFAULT_STT_MODEL
+    llm = str(payload.get("llm_model") or AGENT_MODEL).strip() or AGENT_MODEL
+    tts = str(payload.get("tts_model") or DEFAULT_TTS_MODEL).strip() or DEFAULT_TTS_MODEL
+    voice = str(payload.get("tts_voice") or DEFAULT_TTS_VOICE).strip() or DEFAULT_TTS_VOICE
+    return stt, llm, tts, voice
+
 
 # Default outbound phone flow: short hello first, then substance (see _run_outbound_opening).
 OUTBOUND_GREETING = (
@@ -35,12 +53,8 @@ OUTBOUND_BODY = (
 
 
 class Assistant(Agent):
-    def __init__(self) -> None:
-        super().__init__(
-            instructions="""You are Vikas's AI assistant on a phone call. Short plain sentences. No emojis or markdown.
-
-            After the opening, listen and reply briefly and naturally""",
-        )
+    def __init__(self, instructions: str | None = None) -> None:
+        super().__init__(instructions=instructions or DEFAULT_INSTRUCTIONS)
 
 
 server = AgentServer()
@@ -109,31 +123,6 @@ async def my_agent(ctx: JobContext):
         "room": ctx.room.name,
     }
 
-    session = AgentSession(
-        stt=inference.STT(model="deepgram/nova-3", language="multi"),
-        llm=inference.LLM(model=AGENT_MODEL),
-        tts=inference.TTS(
-            model="cartesia/sonic-3", voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
-        ),
-        turn_detection=MultilingualModel(),
-        vad=ctx.proc.userdata["vad"],
-        preemptive_generation=True,
-    )
-
-    await session.start(
-        agent=Assistant(),
-        room=ctx.room,
-        room_options=room_io.RoomOptions(
-            audio_input=room_io.AudioInputOptions(
-                noise_cancellation=ai_coustics.audio_enhancement(
-                    model=ai_coustics.EnhancerModel.QUAIL_VF_L
-                ),
-            ),
-        ),
-    )
-
-    await ctx.connect()
-
     md = (ctx.job.metadata or "").strip()
     payload: dict = {}
     if md:
@@ -153,6 +142,33 @@ async def my_agent(ctx: JobContext):
         parts.append("What time today works best for you?")
         payload["opening_script"] = " ".join(p for p in parts if p).strip()
         payload.setdefault("two_step", False)
+
+    stt_model, llm_model, tts_model, tts_voice = inference_models_from_job_payload(payload)
+    stt_language = str(payload.get("stt_language") or DEFAULT_STT_LANGUAGE).strip() or DEFAULT_STT_LANGUAGE
+    instructions = str(payload.get("instructions") or "").strip() or DEFAULT_INSTRUCTIONS
+
+    session = AgentSession(
+        stt=inference.STT(model=stt_model, language=stt_language),
+        llm=inference.LLM(model=llm_model),
+        tts=inference.TTS(model=tts_model, voice=tts_voice),
+        turn_detection=MultilingualModel(),
+        vad=ctx.proc.userdata["vad"],
+        preemptive_generation=True,
+    )
+
+    await session.start(
+        agent=Assistant(instructions=instructions),
+        room=ctx.room,
+        room_options=room_io.RoomOptions(
+            audio_input=room_io.AudioInputOptions(
+                noise_cancellation=ai_coustics.audio_enhancement(
+                    model=ai_coustics.EnhancerModel.QUAIL_VF_L
+                ),
+            ),
+        ),
+    )
+
+    await ctx.connect()
 
     await _run_outbound_opening(session, payload)
 

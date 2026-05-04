@@ -8,7 +8,11 @@ class Settings(BaseSettings):
 
     app_base_url: str = "http://localhost:8000"
     # Comma-separated origins for browser/Swagger + demo UI (Vite default :5173)
-    cors_origins: str = "http://localhost:8000,http://127.0.0.1:8000,http://localhost:5173,http://127.0.0.1:5173"
+    cors_origins: str = (
+        "http://localhost:8000,http://127.0.0.1:8000,"
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:5174,http://127.0.0.1:5174"
+    )
     # If set, /auth/google/callback redirects here with ?access_token=... (for SPA demo)
     frontend_oauth_redirect_url: str = ""
     jwt_secret: str = "change-me"
@@ -48,7 +52,6 @@ class Settings(BaseSettings):
     livekit_url: str = ""
     livekit_api_key: str = ""
     livekit_api_secret: str = ""
-
     # Firebase (phone OTP login)
     # Path to a Firebase service account JSON file. Required for verifying Firebase ID tokens.
     firebase_service_account_file: str = ""

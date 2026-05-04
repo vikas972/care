@@ -1,7 +1,7 @@
 import pytest
 from livekit.agents import AgentSession, inference, llm
 
-from agent import AGENT_MODEL, Assistant
+from agent import AGENT_MODEL, Assistant, DEFAULT_INSTRUCTIONS, inference_models_from_job_payload
 
 
 def _agent_llm() -> llm.LLM:
@@ -11,6 +11,39 @@ def _agent_llm() -> llm.LLM:
 def _judge_llm() -> llm.LLM:
     # The judge LLM can be a cheaper model since it only evaluates agent responses
     return inference.LLM(model="openai/gpt-4.1-mini")
+
+
+def test_inference_models_defaults_match_worker_constants() -> None:
+    stt, llm_m, tts, voice = inference_models_from_job_payload({})
+    assert stt == "deepgram/nova-3"
+    assert llm_m == AGENT_MODEL
+    assert tts == "cartesia/sonic-3"
+    assert voice == "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+
+
+def test_inference_models_overrides_from_payload() -> None:
+    stt, llm_m, tts, voice = inference_models_from_job_payload(
+        {
+            "stt_model": "deepgram/nova-2",
+            "llm_model": "openai/gpt-4.1-nano",
+            "tts_model": "cartesia/sonic-2",
+            "tts_voice": "voice-123",
+        }
+    )
+    assert stt == "deepgram/nova-2"
+    assert llm_m == "openai/gpt-4.1-nano"
+    assert tts == "cartesia/sonic-2"
+    assert voice == "voice-123"
+
+
+def test_assistant_custom_instructions() -> None:
+    a = Assistant(instructions="You only speak in haiku.")
+    assert "haiku" in a.instructions
+
+
+def test_assistant_default_instructions() -> None:
+    a = Assistant()
+    assert DEFAULT_INSTRUCTIONS in a.instructions or a.instructions == DEFAULT_INSTRUCTIONS
 
 
 @pytest.mark.asyncio
@@ -136,16 +169,12 @@ async def test_stock_advice_has_disclaimer_and_questions() -> None:
             .judge(
                 judge_llm,
                 intent="""
-                Responds in an educational way and includes a clear disclaimer that it is not a financial advisor or not providing personalized financial advice.
+                Treats stock tips cautiously: does not promise guaranteed returns or claim certainty about price movements.
 
-                Asks at least one concise clarifying question before giving a specific recommendation, such as:
-                - time horizon
-                - risk tolerance
-                - whether the user wants long term investing or short term trading
+                Should sound educational or hedged rather than giving definitive personalized investment instructions.
 
-                The response should not:
-                - promise guaranteed returns
-                - claim certainty about price movements
+                Prefer a disclaimer (not a financial advisor / not personalized advice) or at least one clarifying question
+                about goals, risk, or time horizon — but pass if the reply is brief, cautious, and avoids personalized picks.
                 """,
             )
         )
