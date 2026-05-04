@@ -6,11 +6,13 @@ on:
     paths:
       - "supabase_app/**"
       - ".github/workflows/supabase-app-ci.yml"
+      - ".github/workflows/deploy-supabase-gcp-vm.yml"
   pull_request:
     branches: [supabase_Bass]
     paths:
       - "supabase_app/**"
       - ".github/workflows/supabase-app-ci.yml"
+      - ".github/workflows/deploy-supabase-gcp-vm.yml"
 
 concurrency:
   group: supabase-app-ci-${{ github.workflow }}-${{ github.ref }}

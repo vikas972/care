@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useVoiceAgents } from "../hooks/useVoiceAgents";
-import { apiBase, parseFastApiDetail } from "../lib/api";
+import { apiUrl, parseFastApiDetail } from "../lib/api";
 
 export default function OutboundPage() {
   const { session } = useAuth();
@@ -27,11 +27,6 @@ export default function OutboundPage() {
   async function dial() {
     setErr(null);
     setMsg(null);
-    const base = apiBase();
-    if (!base) {
-      setErr("Set VITE_API_BASE_URL.");
-      return;
-    }
     const access = session?.access_token;
     if (!access) {
       setErr("Not signed in.");
@@ -49,7 +44,7 @@ export default function OutboundPage() {
 
     setBusy(true);
     try {
-      const res = await fetch(`${base}/voice/livekit/outbound`, {
+      const res = await fetch(apiUrl("/voice/livekit/outbound"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${access}`,

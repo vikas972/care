@@ -1,4 +1,4 @@
-import { apiBase } from "../lib/api";
+import { apiBase, apiUsesRelativePaths } from "../lib/api";
 
 export default function SetupPage() {
   const api = apiBase();
@@ -17,7 +17,16 @@ export default function SetupPage() {
 
       <div className="space-y-4">
         <CheckRow ok={!!supabaseUrl} title="Supabase URL (browser)" detail={supabaseUrl || "Missing VITE_SUPABASE_URL"} />
-        <CheckRow ok={!!api} title="FastAPI base URL" detail={api || "Missing VITE_API_BASE_URL"} />
+        <CheckRow
+          ok={!!api || apiUsesRelativePaths()}
+          title="FastAPI base URL"
+          detail={
+            api ||
+            (apiUsesRelativePaths()
+              ? "Same-origin /voice → FastAPI (Vite proxy to port 8001 in dev; nginx in production)"
+              : "Missing VITE_API_BASE_URL")
+          }
+        />
         <CheckRow
           ok={!!import.meta.env.VITE_SUPABASE_ANON_KEY}
           title="Supabase anon key"

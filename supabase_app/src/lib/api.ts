@@ -3,6 +3,19 @@ export function apiBase(): string {
   return (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 }
 
+/** Use /voice/... on the same host (Vite dev proxy or production nginx → backend). */
+export function apiUsesRelativePaths(): boolean {
+  const v = import.meta.env.VITE_API_BASE_URL;
+  return v === undefined || v === "";
+}
+
+/** Absolute or same-origin path for BFF routes (e.g. /voice/livekit/...). */
+export function apiUrl(path: string): string {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  const base = apiBase();
+  return base ? `${base}${p}` : p;
+}
+
 export function parseFastApiDetail(body: { detail?: unknown }): string {
   const d = body.detail;
   if (typeof d === "string") return d;

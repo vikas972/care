@@ -1,0 +1,90 @@
+# Deploy supabase_app to a GCP Compute Engine VM over SSH when changes land on supabase_Bass
+# (merge of a PR produces a push to this branch — same trigger).
+#
+# One-time VM setup (as the SSH user GitHub Actions will use):
+#   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
+#   sudo usermod -aG docker "$USER" && newgrp docker
+#
+# Create server secrets at ~/supabase_app/deploy/backend.env on the VM (never commit).
+# Copy fields from supabase/backend/.env.example and add production values (LiveKit, Supabase service role, JWT, CORS_ORIGINS=http://YOUR_VM_IP).
+#
+# GitHub repo secrets:
+#   GCP_VM_HOST          — VM external IP or hostname
+#   GCP_VM_USER          — SSH user (e.g. ubuntu or your linux user)
+#   GCP_VM_SSH_PRIVATE_KEY — full PEM private key for that user (starts with -----BEGIN OPENSSH PRIVATE KEY----- or RSA PRIVATE KEY-----)
+#   VITE_SUPABASE_URL    — public Supabase URL for the SPA build
+#   VITE_SUPABASE_ANON_KEY — anon key for the SPA build
+# Optional:
+#   VITE_API_BASE_URL    — leave unset for same-origin /voice proxy (recommended). Set only if BFF is on another origin.
+
+name: Deploy Supabase app (GCP VM)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [supabase_Bass]
+    paths:
+      - "supabase_app/**"
+      - ".github/workflows/deploy-supabase-gcp-vm.yml"
+
+concurrency:
+  group: deploy-supabase-gcp-vm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write compose build variables (frontend build-args)
+        working-directory: supabase_app/deploy
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: |
+          {
+            echo "VITE_SUPABASE_URL=${VITE_SUPABASE_URL}"
+            echo "VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}"
+            echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-}"
+          } > .deploy-build.env
+
+      - name: Sync app to VM and restart stack
+        env:
+          GCP_VM_HOST: ${{ secrets.GCP_VM_HOST }}
+          GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
+          GCP_VM_SSH_PRIVATE_KEY: ${{ secrets.GCP_VM_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" && test -n "${GCP_VM_SSH_PRIVATE_KEY:-}" \
+            || { echo "Missing GCP_VM_* or GCP_VM_SSH_PRIVATE_KEY secrets"; exit 1; }
+
+          mkdir -p ~/.ssh
+          echo "$GCP_VM_SSH_PRIVATE_KEY" > ~/.ssh/gcp_deploy
+          chmod 600 ~/.ssh/gcp_deploy
+          ssh-keyscan -H "$GCP_VM_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          RSYNC_RSH="ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}:supabase_app/"
+
+          rsync -az --delete \
+            --filter='protect deploy/backend.env' \
+            --exclude node_modules \
+            --exclude dist \
+            --exclude .venv \
+            --exclude .git \
+            --exclude '.env' \
+            --exclude '.env.local' \
+            --exclude 'supabase/backend/.env' \
+            --exclude 'deploy/backend.env' \
+            -e "$RSYNC_RSH" \
+            supabase_app/ "$REMOTE"
+
+          ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+            "${GCP_VM_USER}@${GCP_VM_HOST}" \
+            "set -euo pipefail
+            cd ~/supabase_app/deploy
+            docker compose --env-file .deploy-build.env up -d --build
+            rm -f .deploy-build.env"

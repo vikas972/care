@@ -10,7 +10,7 @@ import {
 } from "livekit-client";
 import { useAuth } from "../contexts/AuthContext";
 import { useVoiceAgents } from "../hooks/useVoiceAgents";
-import { apiBase, parseFastApiDetail } from "../lib/api";
+import { apiUrl, parseFastApiDetail } from "../lib/api";
 
 type LogLine = { t: number; msg: string };
 
@@ -51,11 +51,6 @@ export default function VoiceDemoPage() {
 
   async function startDemoSession() {
     setErr(null);
-    const base = apiBase();
-    if (!base) {
-      setErr("Set VITE_API_BASE_URL in supabase_app/.env.local (FastAPI origin).");
-      return;
-    }
     if (!agentId) {
       setErr("Choose an agent above.");
       return;
@@ -68,7 +63,7 @@ export default function VoiceDemoPage() {
 
     setStarting(true);
     try {
-      const res = await fetch(`${base}/voice/livekit/demo-session`, {
+      const res = await fetch(apiUrl("/voice/livekit/demo-session"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${access}`,
