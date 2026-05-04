@@ -38,6 +38,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install rsync (runner dependency)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
+
       - name: Write compose build variables (frontend build-args)
         working-directory: supabase_app/deploy
         env:
