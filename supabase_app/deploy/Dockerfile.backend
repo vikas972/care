@@ -3,10 +3,10 @@ WORKDIR /app
 
 RUN touch /app/.env
 
-COPY supabase/backend/requirements.txt .
+COPY platform/api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY supabase/backend/voice_bff ./voice_bff
+COPY platform/api/voice_bff ./voice_bff
 
 ENV PYTHONPATH=/app
 EXPOSE 8080

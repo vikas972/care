@@ -4,3 +4,6 @@ dist
 .env.local
 *.local
 deploy/.deploy-build.env
+platform/api/.env
+platform/api/.venv
+platform/api/__pycache__

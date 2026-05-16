@@ -10,7 +10,7 @@ export default function SetupPage() {
         <h1 className="font-display text-3xl text-white">Setup</h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-400">
           Use the standalone Voice BFF in{" "}
-          <code className="rounded bg-black/40 px-1 text-xs text-slate-400">supabase/backend</code> (not the main SmartCall API).
+          <code className="rounded bg-black/40 px-1 text-xs text-slate-400">platform/api</code> (not the main SmartCall API).
           Secrets stay on the server — never commit <code className="text-slate-500">service_role</code>.
         </p>
       </div>
@@ -35,12 +35,12 @@ export default function SetupPage() {
       </div>
 
       <section className="rounded-2xl border border-white/[0.08] bg-ink-900/40 p-6">
-        <h2 className="font-display text-lg text-white">Voice BFF (<code className="text-slate-500">supabase/backend/.env</code>)</h2>
+        <h2 className="font-display text-lg text-white">Voice BFF (<code className="text-slate-500">platform/api/.env</code>)</h2>
         <ul className="mt-4 space-y-2 text-sm text-slate-400">
           <li>
             Run:{" "}
             <code className="rounded bg-black/40 px-1 text-xs">
-              cd supabase/backend && uvicorn voice_bff.main:app --reload --host 0.0.0.0 --port 8001
+              cd platform/api && uvicorn voice_bff.main:app --reload --host 0.0.0.0 --port 8001
             </code>
           </li>
           <li>
@@ -63,7 +63,7 @@ export default function SetupPage() {
       <section className="rounded-2xl border border-white/[0.08] bg-ink-900/40 p-6">
         <h2 className="font-display text-lg text-white">Database</h2>
         <p className="mt-2 text-sm text-slate-400">
-          Run <code className="rounded bg-black/30 px-1 text-xs">supabase/schema.sql</code> in the Supabase SQL editor for{" "}
+          Run <code className="rounded bg-black/30 px-1 text-xs">platform/database/schema.sql</code> in the Supabase SQL editor for{" "}
           <code className="text-slate-500">voice_agents</code> and storage policies.
         </p>
       </section>
