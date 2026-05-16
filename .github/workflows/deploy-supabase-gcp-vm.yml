@@ -1,21 +1,26 @@
 # Deploy supabase_app to a GCP Compute Engine VM over SSH when changes land on supabase_Bass
-# (merge of a PR produces a push to this branch — same trigger).
 #
-# One-time VM setup (as the SSH user GitHub Actions will use):
-#   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
-#   sudo usermod -aG docker "$USER" && newgrp docker
+# One-time VM setup (SSH user = GCP_VM_USER secret, e.g. ubuntu):
+#   1. Reserve a static external IP on the VM (ephemeral IP changes break GCP_VM_HOST).
+#   2. Generate a deploy key ON YOUR LAPTOP (no passphrase):
+#        ssh-keygen -t ed25519 -f ./github-deploy-care -C "github-actions-care-deploy" -N ""
+#   3. Append the PUBLIC key on the VM (do not replace the whole file if you need other keys):
+#        ssh-copy-id -i ./github-deploy-care.pub USER@VM_IP
+#      Or manually:
+#        echo 'PASTE_PUBLIC_KEY_LINE' >> ~/.ssh/authorized_keys
+#        chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+#   4. GitHub repo secrets (Settings → Secrets → Actions):
+#        GCP_VM_HOST            — static VM IP or DNS
+#        GCP_VM_USER            — linux user that owns ~/.ssh/authorized_keys
+#        GCP_VM_SSH_PRIVATE_KEY — entire contents of github-deploy-care (including BEGIN/END lines)
+#        VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+#   5. VM: docker + ~/supabase_app/deploy/backend.env (see platform/api/.env.example)
 #
-# Create server secrets at ~/supabase_app/deploy/backend.env on the VM (never commit).
-# Copy fields from platform/api/.env.example and add production values (LiveKit, Supabase service role, JWT, CORS_ORIGINS=http://YOUR_VM_IP).
-#
-# GitHub repo secrets:
-#   GCP_VM_HOST          — VM external IP or hostname
-#   GCP_VM_USER          — SSH user (e.g. ubuntu or your linux user)
-#   GCP_VM_SSH_PRIVATE_KEY — full PEM private key for that user (starts with -----BEGIN OPENSSH PRIVATE KEY----- or RSA PRIVATE KEY-----)
-#   VITE_SUPABASE_URL    — public Supabase URL for the SPA build
-#   VITE_SUPABASE_ANON_KEY — anon key for the SPA build
-# Optional:
-#   VITE_API_BASE_URL    — leave unset for same-origin /voice proxy (recommended). Set only if BFF is on another origin.
+# If deploy fails with "Permission denied (publickey)":
+#   - Re-paste the PRIVATE key into GitHub (no extra spaces; keep newlines).
+#   - Confirm the matching PUBLIC key is still in VM authorized_keys.
+#   - Confirm GCP_VM_HOST matches current VM IP (use static IP).
+#   - If GCP OS Login is enabled, add the key via OS Login or disable OS Login for this VM.
 
 name: Deploy Supabase app (GCP VM)
 
@@ -51,26 +56,32 @@ jobs:
             echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-}"
           } > .deploy-build.env
 
+      - name: Load deploy SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GCP_VM_SSH_PRIVATE_KEY }}
+
       - name: Sync app to VM and restart stack
         env:
           GCP_VM_HOST: ${{ secrets.GCP_VM_HOST }}
           GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
-          GCP_VM_SSH_PRIVATE_KEY: ${{ secrets.GCP_VM_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" && test -n "${GCP_VM_SSH_PRIVATE_KEY:-}" \
-            || { echo "Missing GCP_VM_* or GCP_VM_SSH_PRIVATE_KEY secrets"; exit 1; }
+          test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" \
+            || { echo "Missing GCP_VM_HOST or GCP_VM_USER secrets"; exit 1; }
 
-          mkdir -p ~/.ssh
-          echo "$GCP_VM_SSH_PRIVATE_KEY" > ~/.ssh/gcp_deploy
-          chmod 600 ~/.ssh/gcp_deploy
+          REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}"
+          SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=20 -o ServerAliveInterval=15 -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes"
+
           ssh-keyscan -H "$GCP_VM_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-          SSH="ssh -i ~/.ssh/gcp_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
-          REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}"
+          echo "Checking SSH to ${REMOTE}..."
+          if ! ssh $SSH_OPTS "$REMOTE" 'echo "SSH OK — $(whoami)@$(hostname)"'; then
+            echo "::error::SSH authentication failed. Update GCP_VM_SSH_PRIVATE_KEY and the matching public key in ~/.ssh/authorized_keys on the VM. See workflow header comments."
+            exit 255
+          fi
 
-          # Ship the app as a tar stream to avoid requiring rsync on the runner.
-          # We explicitly exclude secrets and build artifacts; the VM keeps deploy/backend.env.
+          echo "Streaming app tarball to VM..."
           tar -czf - \
             --exclude 'supabase_app/node_modules' \
             --exclude 'supabase_app/dist' \
@@ -81,9 +92,10 @@ jobs:
             --exclude 'supabase_app/platform/api/.venv' \
             --exclude 'supabase_app/platform/api/__pycache__' \
             supabase_app \
-            | $SSH "$REMOTE" "mkdir -p ~/supabase_app && tar -xzf - -C ~"
+            | ssh $SSH_OPTS "$REMOTE" "mkdir -p ~/supabase_app && tar -xzf - -C ~"
 
-          $SSH "$REMOTE" "set -euo pipefail
+          echo "Rebuilding Docker stack on VM..."
+          ssh $SSH_OPTS "$REMOTE" "set -euo pipefail
           cd ~/supabase_app/deploy
           docker compose --env-file .deploy-build.env up -d --build
           rm -f .deploy-build.env"
