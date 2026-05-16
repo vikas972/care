@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { Reveal } from "../components/Reveal";
 import { supabase } from "../lib/supabase";
 import type { VoiceAgentRow } from "../types";
 
@@ -59,16 +60,16 @@ export default function AgentsList() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-white">Agents</h1>
+          <h1 className="font-display text-3xl text-white">Voice agents</h1>
           <p className="mt-2 max-w-xl text-sm text-slate-400">
-            Prompts, LiveKit dispatch name, inference overrides, and attachments live here.
+            Your assistants — prompts, voice settings, and LiveKit configuration in one place.
           </p>
         </div>
-        <Link
-          to="/studio/agents/new"
-          className="shrink-0 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-emerald-900/25 hover:from-emerald-500 hover:to-teal-500"
-        >
-          New agent
+        <Link to="/studio/agents/new" className="btn-primary shrink-0">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          New voice agent
         </Link>
       </div>
 
@@ -83,17 +84,37 @@ export default function AgentsList() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="studio-card rounded-2xl border border-white/[0.08] bg-ink-900/40 px-8 py-14 text-center">
-          <p className="text-slate-400">{rows.length === 0 ? "No agents yet." : "No matches for your search."}</p>
-          {rows.length === 0 ? (
-            <Link
-              to="/studio/agents/new"
-              className="mt-4 inline-block rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-500"
-            >
-              Create your first agent
-            </Link>
-          ) : null}
-        </div>
+        <Reveal className="studio-card relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#14141c] to-[#0e0e12] px-8 py-16 text-center">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(45,212,191,0.1),transparent)]" />
+          <div className="relative">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/15 ring-1 ring-teal-500/25">
+              <svg className="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25}>
+                <path
+                  d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path d="M19 10v1a7 7 0 0 1-14 0v-1" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h2 className="font-display text-2xl text-white">
+              {rows.length === 0 ? "Your first voice agent awaits" : "No matches found"}
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-500">
+              {rows.length === 0
+                ? "Define prompts, pick a voice, and connect to LiveKit — you'll be talking to your agent in minutes."
+                : "Try a different search term or create a new assistant."}
+            </p>
+            {rows.length === 0 ? (
+              <Link to="/studio/agents/new" className="btn-primary mt-8">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Build your first voice agent
+              </Link>
+            ) : null}
+          </div>
+        </Reveal>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
           {filtered.map((r) => (

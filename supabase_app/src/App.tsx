@@ -16,8 +16,9 @@ function ProtectedLayout() {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050506] text-sm text-slate-400">
-        Loading session…
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#050506] text-sm text-slate-400">
+        <div className="loading-orb" aria-hidden />
+        <span>Loading session…</span>
       </div>
     );
   }
@@ -44,8 +45,9 @@ export default function App() {
         path="/login"
         element={
           loading ? (
-            <div className="flex min-h-screen items-center justify-center bg-[#050506] text-sm text-slate-400">
-              Loading session…
+            <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#050506] text-sm text-slate-400">
+              <div className="loading-orb" aria-hidden />
+              <span>Loading session…</span>
             </div>
           ) : user ? (
             <Navigate to="/studio" replace />

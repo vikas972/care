@@ -201,10 +201,10 @@ export default function VoiceDemoPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-white">Voice demo</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">
+        <h1 className="font-display text-3xl text-studio-heading">Voice demo</h1>
+        <p className="mt-2 max-w-2xl text-sm text-studio-secondary">
           Browser WebRTC session: FastAPI starts a LiveKit room and dispatches your worker with merged metadata (
-          <code className="text-slate-500">skip_opening</code> for chat-style demo).
+          <code className="text-studio-muted">skip_opening</code> for chat-style demo).
         </p>
       </div>
 
@@ -217,14 +217,14 @@ export default function VoiceDemoPage() {
         </div>
       ) : null}
 
-      <section className="studio-card rounded-2xl border border-white/[0.08] bg-gradient-to-b from-ink-900/90 to-ink-950/80 p-6 shadow-xl shadow-black/20">
-        <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">Agent</label>
+      <section className="studio-card rounded-2xl border border-studio-border bg-gradient-to-b from-ink-900/90 to-ink-950/80 p-6 shadow-xl shadow-black/20">
+        <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-studio-muted">Agent</label>
         <div className="flex flex-wrap items-center gap-3">
           <select
             value={agentId}
             disabled={loading || rows.length === 0}
             onChange={(e) => setSearchParams(e.target.value ? { agent: e.target.value } : {})}
-            className="min-w-[240px] rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            className="min-w-[240px] rounded-xl border border-studio-border bg-studio-input px-4 py-3 text-sm text-studio-heading focus:outline-none focus:ring-2 focus:ring-teal-500/40"
           >
             {rows.length === 0 ? (
               <option value="">No agents — create one first</option>
@@ -238,7 +238,7 @@ export default function VoiceDemoPage() {
           </select>
           <Link
             to="/studio/agents/new"
-            className="rounded-xl border border-white/15 px-4 py-3 text-sm text-slate-200 hover:bg-white/5"
+            className="rounded-xl border border-studio-border-strong px-4 py-3 text-sm text-studio-text hover:bg-studio-hover"
           >
             New agent
           </Link>
@@ -257,7 +257,7 @@ export default function VoiceDemoPage() {
         <div className="rounded-xl border border-red-500/30 bg-red-950/35 px-4 py-3 text-sm text-red-200">{err}</div>
       ) : null}
 
-      <section className="studio-card rounded-2xl border border-white/[0.08] bg-ink-900/50 p-6 sm:p-8">
+      <section className="studio-card rounded-2xl border border-studio-border bg-studio-surface/70 p-6 sm:p-8">
         <div className="mb-6 flex flex-wrap gap-3">
           <button
             type="button"
@@ -272,7 +272,7 @@ export default function VoiceDemoPage() {
               type="button"
               onClick={() => void connect()}
               disabled={!canConnect || starting}
-              className="rounded-xl border border-white/15 px-5 py-2.5 text-sm text-slate-200 hover:bg-white/5 disabled:opacity-40"
+              className="rounded-xl border border-studio-border-strong px-5 py-2.5 text-sm text-studio-text hover:bg-studio-hover disabled:opacity-40"
             >
               Connect
             </button>
@@ -280,7 +280,7 @@ export default function VoiceDemoPage() {
             <button
               type="button"
               onClick={() => void disconnect()}
-              className="rounded-xl border border-white/20 px-5 py-2.5 text-sm text-slate-200 hover:bg-white/5"
+              className="rounded-xl border border-white/20 px-5 py-2.5 text-sm text-studio-text hover:bg-studio-hover"
             >
               Disconnect
             </button>
@@ -289,38 +289,38 @@ export default function VoiceDemoPage() {
             type="button"
             onClick={() => (micOn ? void disableMic() : void enableMic())}
             disabled={!connected}
-            className="rounded-xl bg-white/10 px-5 py-2.5 text-sm text-white hover:bg-white/15 disabled:opacity-40"
+            className="rounded-xl bg-studio-hover px-5 py-2.5 text-sm text-white hover:bg-white/15 disabled:opacity-40"
           >
             {micOn ? "Mute mic" : "Unmute mic"}
           </button>
         </div>
 
         {roomName ? (
-          <p className="mb-4 font-mono text-xs text-slate-500">
-            Room <span className="text-slate-300">{roomName}</span>
+          <p className="mb-4 font-mono text-xs text-studio-muted">
+            Room <span className="text-studio-text">{roomName}</span>
           </p>
         ) : null}
 
-        <p className="mb-4 text-sm text-slate-500">
-          Status: <span className={connected ? "text-emerald-400" : "text-slate-300"}>{status}</span>
+        <p className="mb-4 text-sm text-studio-muted">
+          Status: <span className={connected ? "text-emerald-400" : "text-studio-text"}>{status}</span>
         </p>
 
-        <div className="rounded-xl border border-white/[0.06] bg-ink-950/50 p-4">
-          <div className="mb-2 text-sm font-medium text-slate-300">Agent audio</div>
+        <div className="rounded-xl border border-studio-border-subtle bg-studio-input/50 p-4">
+          <div className="mb-2 text-sm font-medium text-studio-text">Agent audio</div>
           <audio ref={remoteAudioRef} controls className="w-full rounded-lg" />
         </div>
       </section>
 
-      <section className="studio-card rounded-2xl border border-white/[0.08] bg-ink-900/40 p-6">
+      <section className="studio-card rounded-2xl border border-studio-border bg-studio-surface/60 p-6">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg text-white">Logs</h2>
-          <button type="button" onClick={() => setLogs([])} className="text-xs text-slate-500 hover:text-slate-300">
+          <h2 className="font-display text-lg text-studio-heading">Logs</h2>
+          <button type="button" onClick={() => setLogs([])} className="text-xs text-studio-muted hover:text-studio-text">
             Clear
           </button>
         </div>
-        <div className="max-h-52 overflow-auto rounded-lg border border-white/[0.05] bg-ink-950/60 p-3 font-mono text-xs text-slate-400">
+        <div className="max-h-52 overflow-auto rounded-lg border border-white/[0.05] bg-studio-input/60 p-3 font-mono text-xs text-studio-secondary">
           {logs.length === 0 ? (
-            <span className="text-slate-600">No logs yet.</span>
+            <span className="text-studio-faint">No logs yet.</span>
           ) : (
             logs.map((l) => (
               <div key={l.t} className="whitespace-pre-wrap break-words">

@@ -71,10 +71,10 @@ export default function OutboundPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-white">Outbound calls</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">
+        <h1 className="font-display text-3xl text-studio-heading">Outbound calls</h1>
+        <p className="mt-2 max-w-2xl text-sm text-studio-secondary">
           Calls LiveKit SIP outbound API via your FastAPI BFF. Requires{" "}
-          <code className="rounded bg-white/5 px-1 text-slate-300">LIVEKIT_SIP_OUTBOUND_TRUNK</code> on the server.
+          <code className="rounded bg-studio-hover px-1 text-studio-text">LIVEKIT_SIP_OUTBOUND_TRUNK</code> on the server.
         </p>
       </div>
 
@@ -87,15 +87,15 @@ export default function OutboundPage() {
         </div>
       ) : null}
 
-      <section className="studio-card rounded-2xl border border-white/[0.08] bg-gradient-to-b from-ink-900/90 to-ink-950/80 p-6 sm:p-8">
+      <section className="studio-card rounded-2xl border border-studio-border bg-gradient-to-b from-ink-900/90 to-ink-950/80 p-6 sm:p-8">
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">Agent</label>
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-studio-muted">Agent</label>
             <select
               value={agentId}
               disabled={loading || rows.length === 0}
               onChange={(e) => setSearchParams(e.target.value ? { agent: e.target.value } : {})}
-              className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl border border-studio-border bg-studio-input px-4 py-3 text-sm text-studio-heading focus:outline-none focus:ring-2 focus:ring-teal-500/40"
             >
               {rows.length === 0 ? (
                 <option value="">No agents</option>
@@ -108,9 +108,9 @@ export default function OutboundPage() {
               )}
             </select>
             {selected ? (
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-studio-muted">
                 Worker name:{" "}
-                <span className="font-mono text-slate-400">{selected.livekit_agent_name}</span> ·{" "}
+                <span className="font-mono text-studio-secondary">{selected.livekit_agent_name}</span> ·{" "}
                 <Link to={`/studio/agents/${selected.id}`} className="text-emerald-400 hover:text-emerald-300">
                   Edit prompts
                 </Link>
@@ -118,7 +118,7 @@ export default function OutboundPage() {
             ) : null}
           </div>
           <div>
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-studio-muted">
               Destination (E.164)
             </label>
             <input
@@ -126,7 +126,7 @@ export default function OutboundPage() {
               value={toE164}
               onChange={(e) => setToE164(e.target.value)}
               placeholder="+15555550123"
-              className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 font-mono text-sm text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl border border-studio-border bg-studio-input px-4 py-3 font-mono text-sm text-white placeholder:text-studio-faint focus:outline-none focus:ring-2 focus:ring-teal-500/40"
             />
           </div>
         </div>
@@ -150,15 +150,15 @@ export default function OutboundPage() {
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-white/[0.06] bg-ink-900/30 p-6 text-sm text-slate-400">
-        <h3 className="font-medium text-slate-200">Checklist</h3>
+      <section className="rounded-2xl border border-studio-border-subtle bg-ink-900/30 p-6 text-sm text-studio-secondary">
+        <h3 className="font-medium text-studio-text">Checklist</h3>
         <ul className="mt-3 list-inside list-disc space-y-2">
           <li>Outbound SIP trunk configured in LiveKit Cloud</li>
           <li>
-            <code className="text-slate-500">LIVEKIT_SIP_OUTBOUND_TRUNK</code> set in FastAPI{" "}
-            <code className="text-slate-500">.env</code>
+            <code className="text-studio-muted">LIVEKIT_SIP_OUTBOUND_TRUNK</code> set in FastAPI{" "}
+            <code className="text-studio-muted">.env</code>
           </li>
-          <li>Optional caller ID: <code className="text-slate-500">LIVEKIT_SIP_NUMBER</code></li>
+          <li>Optional caller ID: <code className="text-studio-muted">LIVEKIT_SIP_NUMBER</code></li>
         </ul>
       </section>
     </div>

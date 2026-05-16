@@ -7,11 +7,11 @@ export default function SetupPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-white">Setup</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">
+        <h1 className="font-display text-3xl text-studio-heading">Setup</h1>
+        <p className="mt-2 max-w-2xl text-sm text-studio-secondary">
           Use the standalone Voice BFF in{" "}
-          <code className="rounded bg-black/40 px-1 text-xs text-slate-400">platform/api</code> (not the main SmartCall API).
-          Secrets stay on the server — never commit <code className="text-slate-500">service_role</code>.
+          <code className="rounded bg-black/40 px-1 text-xs text-studio-secondary">platform/api</code> (not the main SmartCall API).
+          Secrets stay on the server — never commit <code className="text-studio-muted">service_role</code>.
         </p>
       </div>
 
@@ -34,9 +34,9 @@ export default function SetupPage() {
         />
       </div>
 
-      <section className="rounded-2xl border border-white/[0.08] bg-ink-900/40 p-6">
-        <h2 className="font-display text-lg text-white">Voice BFF (<code className="text-slate-500">platform/api/.env</code>)</h2>
-        <ul className="mt-4 space-y-2 text-sm text-slate-400">
+      <section className="rounded-2xl border border-studio-border bg-studio-surface/60 p-6">
+        <h2 className="font-display text-lg text-studio-heading">Voice BFF (<code className="text-studio-muted">platform/api/.env</code>)</h2>
+        <ul className="mt-4 space-y-2 text-sm text-studio-secondary">
           <li>
             Run:{" "}
             <code className="rounded bg-black/40 px-1 text-xs">
@@ -44,27 +44,27 @@ export default function SetupPage() {
             </code>
           </li>
           <li>
-            <code className="text-slate-500">SUPABASE_URL</code>, <code className="text-slate-500">SUPABASE_SERVICE_ROLE_KEY</code>, JWT verification settings
+            <code className="text-studio-muted">SUPABASE_URL</code>, <code className="text-studio-muted">SUPABASE_SERVICE_ROLE_KEY</code>, JWT verification settings
           </li>
           <li>
-            <code className="text-slate-500">LIVEKIT_URL</code>, <code className="text-slate-500">LIVEKIT_API_KEY</code>,{" "}
-            <code className="text-slate-500">LIVEKIT_API_SECRET</code>
+            <code className="text-studio-muted">LIVEKIT_URL</code>, <code className="text-studio-muted">LIVEKIT_API_KEY</code>,{" "}
+            <code className="text-studio-muted">LIVEKIT_API_SECRET</code>
           </li>
           <li>
-            Outbound: <code className="text-slate-500">LIVEKIT_SIP_OUTBOUND_TRUNK</code>, optional{" "}
-            <code className="text-slate-500">LIVEKIT_SIP_NUMBER</code>
+            Outbound: <code className="text-studio-muted">LIVEKIT_SIP_OUTBOUND_TRUNK</code>, optional{" "}
+            <code className="text-studio-muted">LIVEKIT_SIP_NUMBER</code>
           </li>
           <li>
-            CORS includes this app origin (e.g. <code className="text-slate-500">http://localhost:5174</code>)
+            CORS includes this app origin (e.g. <code className="text-studio-muted">http://localhost:5174</code>)
           </li>
         </ul>
       </section>
 
-      <section className="rounded-2xl border border-white/[0.08] bg-ink-900/40 p-6">
-        <h2 className="font-display text-lg text-white">Database</h2>
-        <p className="mt-2 text-sm text-slate-400">
+      <section className="rounded-2xl border border-studio-border bg-studio-surface/60 p-6">
+        <h2 className="font-display text-lg text-studio-heading">Database</h2>
+        <p className="mt-2 text-sm text-studio-secondary">
           Run <code className="rounded bg-black/30 px-1 text-xs">platform/database/schema.sql</code> in the Supabase SQL editor for{" "}
-          <code className="text-slate-500">voice_agents</code> and storage policies.
+          <code className="text-studio-muted">voice_agents</code> and storage policies.
         </p>
       </section>
     </div>
@@ -73,7 +73,7 @@ export default function SetupPage() {
 
 function CheckRow({ ok, title, detail }: { ok: boolean; title: string; detail: string }) {
   return (
-    <div className="flex flex-wrap items-start gap-4 rounded-xl border border-white/[0.06] bg-ink-900/50 px-4 py-3">
+    <div className="flex flex-wrap items-start gap-4 rounded-xl border border-studio-border-subtle bg-studio-surface/70 px-4 py-3">
       <span
         className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
           ok ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/35" : "bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/30"
@@ -82,8 +82,8 @@ function CheckRow({ ok, title, detail }: { ok: boolean; title: string; detail: s
         {ok ? "✓" : "!"}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="font-medium text-slate-200">{title}</div>
-        <div className="mt-1 break-all font-mono text-xs text-slate-500">{detail}</div>
+        <div className="font-medium text-studio-text">{title}</div>
+        <div className="mt-1 break-all font-mono text-xs text-studio-muted">{detail}</div>
       </div>
     </div>
   );

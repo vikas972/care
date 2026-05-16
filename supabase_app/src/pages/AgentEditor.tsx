@@ -182,8 +182,8 @@ export default function AgentEditor() {
   if (!isNew && loadingRow) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-ink-900/80" />
-        <div className="text-sm text-slate-500">Loading agent…</div>
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-studio-surface/90" />
+        <div className="text-sm text-studio-muted">Loading agent…</div>
       </div>
     );
   }
@@ -192,8 +192,8 @@ export default function AgentEditor() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-white">{title}</h1>
-          <p className="mt-2 max-w-xl text-sm text-slate-400">
+          <h1 className="font-display text-3xl text-studio-heading">{title}</h1>
+          <p className="mt-2 max-w-xl text-sm text-studio-secondary">
             Maps to LiveKit job metadata and worker prompts. Use tabs for browser demo and outbound dialing.
           </p>
         </div>
@@ -209,102 +209,102 @@ export default function AgentEditor() {
       ) : null}
 
       <form onSubmit={(e) => void onSubmit(e)} className="max-w-3xl space-y-6">
-        <section className="studio-card space-y-4 rounded-2xl border border-white/[0.08] bg-ink-900/60 p-6">
+        <section className="studio-card space-y-4 rounded-2xl border border-studio-border bg-studio-surface/80 p-6">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Display name</label>
+            <label className="block text-sm text-studio-secondary mb-1">Display name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl bg-studio-input border border-studio-border px-4 py-2.5 text-studio-heading focus:outline-none focus:ring-2 focus:ring-teal-500/40"
               placeholder="Outbound sales — Vikas"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">LiveKit agent name</label>
+            <label className="block text-sm text-studio-secondary mb-1">LiveKit agent name</label>
             <input
               value={livekitAgentName}
               onChange={(e) => setLivekitAgentName(e.target.value)}
-              className="w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-2.5 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl bg-studio-input border border-studio-border px-4 py-2.5 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/40"
               placeholder="my-agent"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-studio-muted mt-1">
               Must match the worker dispatch name (for example{" "}
-              <code className="text-slate-400">rtc_session(agent_name=&quot;…&quot;)</code>).
+              <code className="text-studio-secondary">rtc_session(agent_name=&quot;…&quot;)</code>).
             </p>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Instructions (system prompt)</label>
+            <label className="block text-sm text-studio-secondary mb-1">Instructions (system prompt)</label>
             <textarea
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               rows={6}
-              className="w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl bg-studio-input border border-studio-border px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/40"
               placeholder="You are …"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">
+            <label className="block text-sm text-studio-secondary mb-1">
               Opening script / outbound payload text (optional)
             </label>
             <textarea
               value={openingScript}
               onChange={(e) => setOpeningScript(e.target.value)}
               rows={4}
-              className="w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl bg-studio-input border border-studio-border px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/40"
               placeholder="Passed as opening_script in job metadata when you dial out."
             />
           </div>
 
-          <div className="space-y-3 rounded-xl border border-white/[0.06] bg-ink-950/40 p-4">
-            <h3 className="text-sm font-medium text-slate-200">LiveKit Inference overrides</h3>
-            <p className="text-xs text-slate-500">
-              Stored in <code className="text-slate-400">job_metadata</code>. Leave blank to use worker defaults (
-              <span className="font-mono text-slate-500">deepgram/nova-3</span>,{" "}
-              <span className="font-mono text-slate-500">openai/gpt-4.1-mini</span>, Cartesia sonic).
+          <div className="space-y-3 rounded-xl border border-studio-border-subtle bg-studio-input/40 p-4">
+            <h3 className="text-sm font-medium text-studio-text">LiveKit Inference overrides</h3>
+            <p className="text-xs text-studio-muted">
+              Stored in <code className="text-studio-secondary">job_metadata</code>. Leave blank to use worker defaults (
+              <span className="font-mono text-studio-muted">deepgram/nova-3</span>,{" "}
+              <span className="font-mono text-studio-muted">openai/gpt-4.1-mini</span>, Cartesia sonic).
             </p>
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-slate-500 mb-1">stt_model</label>
+                <label className="block text-xs text-studio-muted mb-1">stt_model</label>
                 <input
                   value={sttModel}
                   onChange={(e) => setSttModel(e.target.value)}
-                  className="w-full rounded-lg bg-ink-950 border border-white/10 px-3 py-2 text-white font-mono text-xs"
+                  className="w-full rounded-lg bg-studio-input border border-studio-border px-3 py-2 text-studio-heading font-mono text-xs"
                   placeholder="deepgram/nova-3"
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 mb-1">stt_language</label>
+                <label className="block text-xs text-studio-muted mb-1">stt_language</label>
                 <input
                   value={sttLanguage}
                   onChange={(e) => setSttLanguage(e.target.value)}
-                  className="w-full rounded-lg bg-ink-950 border border-white/10 px-3 py-2 text-white font-mono text-xs"
+                  className="w-full rounded-lg bg-studio-input border border-studio-border px-3 py-2 text-studio-heading font-mono text-xs"
                   placeholder="multi"
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 mb-1">llm_model</label>
+                <label className="block text-xs text-studio-muted mb-1">llm_model</label>
                 <input
                   value={llmModel}
                   onChange={(e) => setLlmModel(e.target.value)}
-                  className="w-full rounded-lg bg-ink-950 border border-white/10 px-3 py-2 text-white font-mono text-xs"
+                  className="w-full rounded-lg bg-studio-input border border-studio-border px-3 py-2 text-studio-heading font-mono text-xs"
                   placeholder="openai/gpt-4.1-mini"
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500 mb-1">tts_model</label>
+                <label className="block text-xs text-studio-muted mb-1">tts_model</label>
                 <input
                   value={ttsModel}
                   onChange={(e) => setTtsModel(e.target.value)}
-                  className="w-full rounded-lg bg-ink-950 border border-white/10 px-3 py-2 text-white font-mono text-xs"
+                  className="w-full rounded-lg bg-studio-input border border-studio-border px-3 py-2 text-studio-heading font-mono text-xs"
                   placeholder="cartesia/sonic-3"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs text-slate-500 mb-1">tts_voice</label>
+                <label className="block text-xs text-studio-muted mb-1">tts_voice</label>
                 <input
                   value={ttsVoice}
                   onChange={(e) => setTtsVoice(e.target.value)}
-                  className="w-full rounded-lg bg-ink-950 border border-white/10 px-3 py-2 text-white font-mono text-xs"
+                  className="w-full rounded-lg bg-studio-input border border-studio-border px-3 py-2 text-studio-heading font-mono text-xs"
                   placeholder="Cartesia voice id"
                 />
               </div>
@@ -312,26 +312,26 @@ export default function AgentEditor() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">
+            <label className="block text-sm text-studio-secondary mb-1">
               Extra job metadata (JSON object)
             </label>
             <textarea
               value={metadataJson}
               onChange={(e) => setMetadataJson(e.target.value)}
               rows={8}
-              className="w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-2.5 text-white font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-xl bg-studio-input border border-studio-border px-4 py-2.5 text-white font-mono text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/40"
               spellCheck={false}
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-studio-muted mt-1">
               Merged into LiveKit job metadata (for example{" "}
-              <code className="text-slate-400">user_name</code>,{" "}
-              <code className="text-slate-400">two_step</code>). Model keys above are saved separately from this JSON.
+              <code className="text-studio-secondary">user_name</code>,{" "}
+              <code className="text-studio-secondary">two_step</code>). Model keys above are saved separately from this JSON.
             </p>
           </div>
         </section>
 
         {!isNew && agentId ? (
-          <section className="rounded-2xl border border-emerald-500/20 bg-emerald-950/15 px-6 py-4 text-sm text-slate-400">
+          <section className="rounded-2xl border border-emerald-500/20 bg-emerald-950/15 px-6 py-4 text-sm text-studio-secondary">
             Run this agent from the{" "}
             <Link to={`/studio/demo?agent=${encodeURIComponent(agentId)}`} className="font-medium text-emerald-300 hover:text-emerald-200">
               Voice demo
@@ -344,18 +344,18 @@ export default function AgentEditor() {
           </section>
         ) : null}
 
-        <section className="studio-card space-y-3 rounded-2xl border border-white/[0.08] bg-ink-900/60 p-6">
-          <h2 className="font-display text-lg text-white">Storage attachment</h2>
-          <p className="text-sm text-slate-400">
-            Private bucket <span className="text-slate-300">{BUCKET}</span>. Files are saved under your
+        <section className="studio-card space-y-3 rounded-2xl border border-studio-border bg-studio-surface/80 p-6">
+          <h2 className="font-display text-lg text-studio-heading">Storage attachment</h2>
+          <p className="text-sm text-studio-secondary">
+            Private bucket <span className="text-studio-text">{BUCKET}</span>. Files are saved under your
             user id then agent id.
           </p>
           {attachmentPath ? (
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="text-slate-400 font-mono text-xs break-all">{attachmentPath}</span>
+              <span className="text-studio-secondary font-mono text-xs break-all">{attachmentPath}</span>
               <button
                 type="button"
-                className="rounded-lg border border-white/15 px-3 py-1.5 text-slate-200 hover:bg-white/5"
+                className="rounded-lg border border-studio-border-strong px-3 py-1.5 text-studio-text hover:bg-studio-hover"
                 onClick={() => {
                   void (async () => {
                     try {
@@ -388,16 +388,16 @@ export default function AgentEditor() {
               ) : null}
             </div>
           ) : (
-            <p className="text-xs text-slate-500">No file attached yet.</p>
+            <p className="text-xs text-studio-muted">No file attached yet.</p>
           )}
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Upload file</label>
+            <label className="block text-sm text-studio-secondary mb-1">Upload file</label>
             <input
               type="file"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-slate-200"
+              className="block w-full text-sm text-studio-secondary file:mr-4 file:rounded-lg file:border-0 file:bg-studio-hover file:px-3 file:py-2 file:text-studio-text"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-studio-muted mt-1">
               Saves when you click Save. For new agents, the row is created first, then the upload runs.
             </p>
           </div>
@@ -413,7 +413,7 @@ export default function AgentEditor() {
           </button>
           <Link
             to="/studio/agents"
-            className="inline-flex items-center rounded-xl border border-white/15 px-5 py-2.5 text-sm text-slate-200 hover:bg-white/5"
+            className="inline-flex items-center rounded-xl border border-studio-border-strong px-5 py-2.5 text-sm text-studio-text hover:bg-studio-hover"
           >
             Cancel
           </Link>
