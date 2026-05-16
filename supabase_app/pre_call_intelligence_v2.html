@@ -1,0 +1,302 @@
+
+<h2 class="sr-only">Pre-call intelligence and personalisation engine — interactive explorer showing how BPWealth client data becomes personalised voice agent behaviour</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{padding:0}
+.wrap{padding:.5rem 0 1rem}
+.top{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;align-items:start}
+.panel{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.panel-hd{padding:10px 13px;border-bottom:.5px solid var(--color-border-tertiary);font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px}
+.src-list{padding:6px}
+.src-btn{width:100%;display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--border-radius-md);cursor:pointer;border:none;background:transparent;text-align:left;transition:background .12s}
+.src-btn:hover{background:var(--color-background-secondary)}
+.src-btn.active{background:var(--color-background-info)}
+.src-btn.active .src-icon{color:var(--color-text-info)}
+.src-btn.active .src-name{color:var(--color-text-info);font-weight:500}
+.src-btn.active .src-ct{color:var(--color-text-info)}
+.src-icon{font-size:15px;color:var(--color-text-secondary);flex-shrink:0}
+.src-name{font-size:12px;color:var(--color-text-primary);flex:1}
+.src-ct{font-size:10px;color:var(--color-text-tertiary)}
+.sig-area{padding:10px 12px;min-height:260px}
+.sig-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.sig-item{padding:6px 0;border-bottom:.5px solid var(--color-border-tertiary);display:grid;grid-template-columns:100px 1fr;gap:8px;align-items:start}
+.sig-item:last-child{border-bottom:none}
+.sig-k{font-size:10px;color:var(--color-text-secondary);line-height:1.4;padding-top:1px}
+.sig-v{font-size:11px;color:var(--color-text-primary);font-weight:500;line-height:1.4}
+.sig-use{font-size:10px;color:var(--color-text-info);margin-top:2px;line-height:1.35;font-weight:400}
+.mid{margin-bottom:12px}
+.flow-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}
+.fstep{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);padding:10px 10px 10px;position:relative;cursor:pointer;transition:all .12s}
+.fstep:not(:last-child){border-right:none}
+.fstep:first-child{border-radius:var(--border-radius-md) 0 0 var(--border-radius-md)}
+.fstep:last-child{border-radius:0 var(--border-radius-md) var(--border-radius-md) 0}
+.fstep.active{background:var(--color-background-info);border-color:var(--color-border-info);z-index:1}
+.fstep.active .fs-num{color:var(--color-text-info)}
+.fstep.active .fs-name{color:var(--color-text-info)}
+.fstep.active .fs-sub{color:var(--color-text-info)}
+.fs-num{font-size:10px;color:var(--color-text-tertiary);margin-bottom:2px;font-weight:500}
+.fs-name{font-size:11px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;line-height:1.3}
+.fs-sub{font-size:10px;color:var(--color-text-secondary);line-height:1.35}
+.flow-detail{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-top:none;border-radius:0 0 var(--border-radius-md) var(--border-radius-md);padding:12px 14px}
+.fd-h{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.fd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fd-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px}
+.fd-label{font-size:10px;color:var(--color-text-secondary);margin-bottom:2px;font-weight:500}
+.fd-val{font-size:11px;color:var(--color-text-primary);line-height:1.4}
+.fd-arrow{font-size:10px;color:var(--color-text-info);margin-top:2px}
+.bot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hook-list{padding:8px}
+.hook-item{padding:8px 10px;border-radius:var(--border-radius-md);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;border-bottom:.5px solid var(--color-border-tertiary);transition:background .12s}
+.hook-item:last-child{border-bottom:none}
+.hook-item:hover{background:var(--color-background-secondary)}
+.hook-item.active{background:var(--color-background-success)}
+.hook-item.active .hk-name{color:var(--color-text-success)}
+.hook-item.active .hk-sig{color:var(--color-text-success)}
+.hk-name{font-size:11px;font-weight:500;color:var(--color-text-primary);margin-bottom:1px}
+.hk-sig{font-size:10px;color:var(--color-text-secondary)}
+.script-area{padding:12px 14px;min-height:200px}
+.script-tag{font-size:10px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.script-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;line-height:1.65;color:var(--color-text-primary);margin-bottom:8px}
+.hi{color:var(--color-text-info);font-weight:500}
+.script-why{font-size:10px;color:var(--color-text-secondary);line-height:1.5;padding:6px 10px;border-left:2px solid var(--color-border-info)}
+.ctx-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctx-label{font-size:11px;color:var(--color-text-secondary)}
+.ctx-val{font-size:11px;font-weight:500;color:var(--color-text-primary)}
+.ctx-sep{color:var(--color-border-secondary);font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:var(--border-radius-md);font-weight:500}
+.badge.s{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.badge.i{background:var(--color-background-info);color:var(--color-text-info)}
+.badge.g{background:var(--color-background-success);color:var(--color-text-success)}
+.badge.w{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge.r{background:var(--color-background-danger);color:var(--color-text-danger)}
+.sec-lbl{font-size:10px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;margin-top:12px}
+</style>
+
+<div class="wrap">
+
+<div class="ctx-bar">
+  <span class="ctx-label">Client</span><span class="ctx-val">Rajesh Mehta · BPW-40291</span>
+  <span class="ctx-sep">·</span>
+  <span class="ctx-label">Status</span><span class="badge g"><i class="ti ti-check" aria-hidden="true"></i> Active</span>
+  <span class="ctx-sep">·</span>
+  <span class="ctx-label">Language</span><span class="badge i">Gujarati / Hinglish</span>
+  <span class="ctx-sep">·</span>
+  <span class="ctx-label">Risk</span><span class="badge w">Moderate-aggressive</span>
+  <span class="ctx-sep">·</span>
+  <span class="ctx-label">Conversion rate</span><span class="badge g">62%</span>
+  <span class="ctx-sep">·</span>
+  <span class="ctx-label">Cash available</span><span class="ctx-val">₹2,40,000</span>
+</div>
+
+<div class="sec-lbl">Step 1 — data sources &amp; signals (click a source)</div>
+<div class="top">
+  <div class="panel">
+    <div class="panel-hd"><i class="ti ti-database" aria-hidden="true"></i> 7 data sources</div>
+    <div class="src-list" id="src-list"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hd"><i class="ti ti-eye" aria-hidden="true"></i> Signals extracted</div>
+    <div class="sig-area" id="sig-area"><div style="color:var(--color-text-tertiary);font-size:12px;padding:8px 0">Select a source to see signals</div></div>
+  </div>
+</div>
+
+<div class="sec-lbl">Step 2 — how signals flow into the call (click a stage)</div>
+<div class="mid">
+  <div class="flow-steps" id="flow-steps"></div>
+  <div class="flow-detail" id="flow-detail"></div>
+</div>
+
+<div class="sec-lbl">Step 3 — live call personalisation hooks (click a hook)</div>
+<div class="bot">
+  <div class="panel">
+    <div class="panel-hd"><i class="ti ti-player-play" aria-hidden="true"></i> 8 personalisation moments</div>
+    <div class="hook-list" id="hook-list"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hd"><i class="ti ti-message-2" aria-hidden="true"></i> What the agent says</div>
+    <div class="script-area" id="script-area"><div style="color:var(--color-text-tertiary);font-size:12px;padding:8px 0">Select a hook to see the script</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SOURCES = [
+  {id:0, icon:'ti-user-circle', name:'Demographics & KYC', ct:'7 signals', color:'var(--color-text-info)',
+   sigs:[
+    {k:'Age & occupation',v:'38 · Self-employed businessman',use:'→ shorter pitch preferred; flexible call window'},
+    {k:'Income bracket',v:'₹25–50L / year',use:'→ anchor ticket size at ₹1–2L; not ₹10K trades'},
+    {k:'KYC risk appetite',v:'Moderate-aggressive',use:'→ eligible: cash + F&O; block: penny stocks, high-beta speculative'},
+    {k:'Location',v:'Ahmedabad, Gujarat',use:'→ primary signal for Gujarati as default language'},
+    {k:'Registered language',v:'Gujarati',use:'→ open call in Gujarati / Hinglish blend'},
+    {k:'KYC status',v:'Active — complete',use:'→ no suppression; fully eligible for all products'},
+    {k:'Occupation type',v:'Business owner',use:'→ risk-aware but decisive; respond to data, not hype'},
+  ]},
+  {id:1, icon:'ti-chart-candle', name:'Trading behaviour', ct:'8 signals', color:'var(--color-text-success)',
+   sigs:[
+    {k:'Segments traded',v:'Cash + F&O (equity options)',use:'→ can pitch both; F&O calls often have higher ticket'},
+    {k:'Avg ticket size',v:'₹85,000 per trade',use:'→ suggest 150 shares @ ₹820 = ₹1.23L (comfortable range)'},
+    {k:'Holding period',v:'60% intraday · 40% swing',use:'→ lead with intraday framing; offer swing as secondary angle'},
+    {k:'Frequently traded',v:'HDFC, Auto sector, IT',use:'→ Tata Motors fits auto pattern; natural recommendation'},
+    {k:'P&L (last 6 mo.)',v:'+₹1.4L net profitable',use:'→ client is overall profitable — reference with confidence'},
+    {k:'Active / dormant',v:'Active — traded 3 days ago',use:'→ skip dormant flow; go straight to recommendation pitch'},
+    {k:'Best call type',v:'Intraday > swing performance',use:'→ always lead with intraday; swing is the fallback offer'},
+    {k:'Conversion rate',v:'62% (platform avg: 41%)',use:'→ high priority in dial queue; likely to act if pitch is tight'},
+  ]},
+  {id:2, icon:'ti-briefcase', name:'Portfolio holdings', ct:'5 signals', color:'var(--color-text-warning)',
+   sigs:[
+    {k:'Current holdings',v:'HDFC Bank · Infosys · Tata Motors',use:'→ Tata Motors already held — pitch as add-on, not new entry'},
+    {k:'Sector exposure',v:'IT: 42% (over-exposed)',use:'→ avoid IT stocks; auto/banking improves diversification'},
+    {k:'Cash available',v:'₹2,40,000',use:'→ 150 shares @ ₹820 fits with ₹1.17L margin remaining'},
+    {k:'Concentration',v:'Top 3 = 78% of portfolio',use:'→ mention diversification benefit of the new position'},
+    {k:'Unrealised P&L',v:'+₹32K on HDFC Bank',use:'→ reference HDFC win to build trust before the pitch'},
+  ]},
+  {id:3, icon:'ti-star', name:'StoxCall history', ct:'6 signals', color:'#7F77DD',
+   sigs:[
+    {k:'Tips received',v:'14 calls in 6 months',use:'→ frequent recipient; not a cold experience for this client'},
+    {k:'Tips acted upon',v:'9 of 14 (64%)',use:'→ highly receptive; will act if the pitch lands clean'},
+    {k:'Best performing',v:'Intraday tips (3 of top 5)',use:'→ intraday angle resonates most with this client'},
+    {k:'Last win',v:'HDFC Bank +8.2% in March',use:'→ strong hook: "similar setup to the HDFC call you benefited from"'},
+    {k:'Last loss',v:'Midcap IT -3.1% (6 weeks ago)',use:'→ acknowledge carefully if raised; don\'t pretend it didn\'t happen'},
+    {k:'Unacted tips',v:'2 recent tips not acted upon',use:'→ don\'t reference these; focus on this new opportunity'},
+  ]},
+  {id:4, icon:'ti-device-mobile', name:'App behaviour', ct:'7 signals', color:'var(--color-text-info)',
+   sigs:[
+    {k:'Watchlist',v:'Tata Motors added 2 days ago',use:'→ primary hook: "I noticed you were tracking this on the app..."'},
+    {k:'Research note',v:'Tata Motors note opened 1 day ago',use:'→ warm lead; already done their own research — validate it'},
+    {k:'Login frequency',v:'4–5× per week',use:'→ engaged user; WhatsApp recap will be opened and read'},
+    {k:'Screens visited',v:'F&O chain · option calculator',use:'→ may mention an options angle on Tata Motors if interest shows'},
+    {k:'Session depth',v:'Avg 8.4 min per session',use:'→ high engagement; can handle a slightly longer, richer pitch'},
+    {k:'Push notification CTR',v:'38% (platform avg: 19%)',use:'→ send WhatsApp summary immediately post-call; he reads it'},
+    {k:'Drop-off point',v:'Exits at order placement screen',use:'→ hesitates at the last step; CTA must address this proactively'},
+  ]},
+  {id:5, icon:'ti-mail', name:'Campaign engagement', ct:'4 signals', color:'var(--color-text-secondary)',
+   sigs:[
+    {k:'WhatsApp open rate',v:'71% (platform avg: 54%)',use:'→ WhatsApp is primary post-call channel; use it every time'},
+    {k:'Email open rate',v:'22% — low',use:'→ do not rely on email; WhatsApp only for this client'},
+    {k:'Call connect rate',v:'Picks up within 2 rings',use:'→ good connect rate; schedule in his peak window (10–11:30am)'},
+    {k:'Best call window',v:'Weekday 10am–11:30am',use:'→ always schedule outbound for this client in this window'},
+  ]},
+  {id:6, icon:'ti-message-circle', name:'Service & interaction', ct:'4 signals', color:'var(--color-text-danger)',
+   sigs:[
+    {k:'Open complaints',v:'None — clear',use:'→ no suppression flag; safe to proceed with the call'},
+    {k:'RM notes',v:'"Responds well to data-backed pitches"',use:'→ lead with technical setup + fundamental catalyst, not just momentum'},
+    {k:'Call dispositions',v:'7 converted · 2 callback · 1 declined',use:'→ strong relationship history; low friction expected'},
+    {k:'Support tickets',v:'1 brokerage query — resolved',use:'→ resolved issue; do not surface it on the call'},
+  ]},
+];
+
+const FLOW_STAGES = [
+  {id:0, num:'T−30s', name:'Data fetch', sub:'Pull all 7 sources',
+   items:[
+    {l:'CRM pull', v:'Risk profile · language · history', a:'→ pre-loaded into agent working memory'},
+    {l:'Trading platform', v:'Holdings · cash · ticket size', a:'→ exact numbers used in pitch'},
+    {l:'App events', v:'Watchlist · screens · sessions', a:'→ generates personalisation hooks'},
+    {l:'StoxCall log', v:'Past tips · outcomes · objection types', a:'→ pre-loads objection rebuttals'},
+   ]},
+  {id:1, num:'T−10s', name:'Eligibility filter', sub:'Block ineligible products',
+   items:[
+    {l:'Segment check', v:'Cash + F&O — both eligible', a:'→ unlocks full product range for this client'},
+    {l:'Risk filter', v:'Moderate-aggressive confirmed', a:'→ allow mid-cap; block high-beta penny stocks'},
+    {l:'Sector check', v:'IT over-exposed at 42%', a:'→ suppress IT stock recommendations today'},
+    {l:'Suppression flags', v:'No DND · no open complaint', a:'→ green light to proceed with call'},
+   ]},
+  {id:2, num:'T−5s', name:'Scrip selection', sub:'Pick best-fit recommendation',
+   items:[
+    {l:'Match to watchlist', v:'Tata Motors added 2 days ago', a:'→ watchlist match = strongest possible hook'},
+    {l:'Ticket calibration', v:'150 shares @ ₹820 = ₹1.23L', a:'→ fits cash available and typical position size'},
+    {l:'Sector fit', v:'Auto sector — not over-exposed', a:'→ Tata Motors adds diversification benefit'},
+    {l:'Entry / target / SL', v:'₹820 → ₹880 · SL ₹805', a:'→ pre-loaded into recommendation script'},
+   ]},
+  {id:3, num:'T−2s', name:'Hook assembly', sub:'Build personalised lines',
+   items:[
+    {l:'Primary hook', v:'Watchlist match: Tata Motors', a:'→ opens with "I noticed you were tracking this..."'},
+    {l:'Confidence builder', v:'HDFC +8.2% win in March', a:'→ reinforces past success before the pitch'},
+    {l:'Complement angle', v:'Client already holds Tata Motors', a:'→ frames as add-on position, not a new bet'},
+    {l:'Objection pre-load', v:'Volatility objection most likely', a:'→ tight SL reframe is ready to deploy'},
+   ]},
+  {id:4, num:'T=0', name:'Dial', sub:'Call begins with full context',
+   items:[
+    {l:'Language', v:'Opens in Gujarati / Hinglish blend', a:'→ switches instantly if client signals preference'},
+    {l:'Tone calibration', v:'Professional · data-backed · friendly', a:'→ matches RM note: "responds to data, not hype"'},
+    {l:'Max turns', v:'5 conversation turns', a:'→ then CTA regardless of objection status'},
+    {l:'Escalation trigger', v:'2× negative sentiment', a:'→ auto-transfers to human RM with call summary'},
+   ]},
+];
+
+const HOOKS = [
+  {id:0, name:'Watchlist signal → opening hook', sig:'Tata Motors added to watchlist 2 days ago · research note opened yesterday',
+   script:'"Rajeshbhai, I noticed you were looking at Tata Motors on the app just two days ago — and our research team has put out a very specific note on it today. I thought you\'d want to hear this before the market opens. It\'ll only take 60 seconds."',
+   why:'The watchlist signal makes this feel like a direct response to something the client was already thinking about — not a cold call. Opens a door instead of pushing through one.'},
+  {id:1, name:'Past win → confidence builder', sig:'HDFC Bank call delivered +8.2% in March · client acted on it',
+   script:'"You did really well on the HDFC Bank call we shared in March — that was a similar setup: tight stop-loss, clear catalyst, short time horizon. This one has the same discipline."',
+   why:'References a specific, real outcome the client experienced. Far more credible than generic claims about "our track record".'},
+  {id:2, name:'Current holding → add-on framing', sig:'Client already holds Tata Motors in portfolio',
+   script:'"You\'re already in Tata Motors, so you know the story. This is an opportunity to add to a position you already believe in, at what our team thinks is a strong re-entry point before the EV volume data drops next week."',
+   why:'Reframes the pitch from "buy something new" (risky) to "add to something you already own" (familiar). Reduces perceived risk dramatically.'},
+  {id:3, name:'Cash + ticket → exact sizing', sig:'₹2,40,000 cash available · typical ticket ₹85K · suggested qty 150 shares',
+   script:'"At today\'s price of ₹820, 150 shares is ₹1.23 lakhs — that\'s within your normal range and leaves you with comfortable margin. You\'re not stretching at all for this one."',
+   why:'Specific numbers calibrated to this client eliminate the "I need to check my cash" objection before it\'s raised. Makes acting feel effortless.'},
+  {id:4, name:'Volatility objection → pre-loaded reframe', sig:'Client historically raises volatility concern · RM note confirms this pattern',
+   script:'"I completely understand — this market feels unpredictable right now. But that\'s actually why this setup works: the stop-loss is at ₹805, so your maximum downside on 150 shares is ₹2,250. The upside to target is ₹9,000. The asymmetry here is firmly in your favour."',
+   why:'Client has raised this specific objection before. The rebuttal is ready before the client finishes speaking — response is fast, specific, and data-backed.'},
+  {id:5, name:'Loss history → honest reassurance', sig:'Midcap IT call resulted in -3.1% loss 6 weeks ago',
+   script:'"I\'m aware the midcap IT call a few weeks ago didn\'t go the way we wanted — I won\'t pretend otherwise. What\'s different here is the sector (auto, not IT) and the catalyst is a specific dated event, not a macro view. I wouldn\'t be calling if I wasn\'t confident in the structure."',
+   why:'Acknowledging the loss before the client raises it builds credibility. Suppressing it destroys trust if the client brings it up themselves.'},
+  {id:6, name:'Language preference → fluid switch', sig:'Registered: Gujarati · App language: Hindi · Past calls: Hinglish mix',
+   script:'Agent opens in Hinglish: "Namaste Rajeshbhai, aaj ek specific opportunity hai Tata Motors mein jo aapke liye relevant lagti hai…" If client replies in Gujarati: "Tamne Gujarati maa vaato kari sakhu? Bilkul, mari pan suvida che."',
+   why:'Starting in Hinglish (the blend the client naturally uses in calls) is more comfortable than formal Hindi or English. Switching on request shows respect and builds rapport instantly.'},
+  {id:7, name:'Drop-off pattern → proactive CTA', sig:'App data: client exits consistently at order placement screen',
+   script:'"If you\'d like to proceed, I\'ll send you a WhatsApp right now with the entry, target, stop-loss, and a link. Tap it and your dealer has everything they need — you don\'t have to navigate to the order screen yourself."',
+   why:'App data shows this client hesitates at the order placement step. The CTA bypasses that friction point entirely by offering a WhatsApp deep link instead.'},
+];
+
+function renderSources(){
+  const list=document.getElementById('src-list');
+  list.innerHTML=SOURCES.map(s=>`<button class="src-btn" id="sb-${s.id}" onclick="selectSrc(${s.id})"><i class="ti ${s.icon} src-icon" style="color:${s.color}" aria-hidden="true"></i><span class="src-name">${s.name}</span><span class="src-ct">${s.ct}</span></button>`).join('');
+}
+
+function selectSrc(id){
+  document.querySelectorAll('.src-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sb-'+id).classList.add('active');
+  const s=SOURCES[id];
+  document.getElementById('sig-area').innerHTML=`<div class="sig-title">${s.name} — signals &amp; usage</div>`+s.sigs.map(x=>`<div class="sig-item"><div class="sig-k">${x.k}</div><div><div class="sig-v">${x.v}</div><div class="sig-use">${x.use}</div></div></div>`).join('');
+}
+
+function renderFlow(){
+  const steps=document.getElementById('flow-steps');
+  steps.innerHTML=FLOW_STAGES.map(f=>`<div class="fstep" id="fs-${f.id}" onclick="selectFlow(${f.id})"><div class="fs-num">${f.num}</div><div class="fs-name">${f.name}</div><div class="fs-sub">${f.sub}</div></div>`).join('');
+  selectFlow(0);
+}
+
+function selectFlow(id){
+  document.querySelectorAll('.fstep').forEach(f=>f.classList.remove('active'));
+  document.getElementById('fs-'+id).classList.add('active');
+  const f=FLOW_STAGES[id];
+  const detail=document.getElementById('flow-detail');
+  const rows=f.items.map(i=>`<div class="fd-item"><div class="fd-label">${i.l}</div><div class="fd-val">${i.v}</div><div class="fd-arrow">${i.a}</div></div>`).join('');
+  detail.innerHTML=`<div class="fd-h">${f.name} — what happens at ${f.num}</div><div class="fd-grid">${rows}</div>`;
+}
+
+function renderHooks(){
+  const list=document.getElementById('hook-list');
+  list.innerHTML=HOOKS.map(h=>`<button class="hook-item" id="hk-${h.id}" onclick="selectHook(${h.id})"><div class="hk-name">${h.name}</div><div class="hk-sig">${h.sig}</div></button>`).join('');
+}
+
+function selectHook(id){
+  document.querySelectorAll('.hook-item').forEach(h=>h.classList.remove('active'));
+  document.getElementById('hk-'+id).classList.add('active');
+  const h=HOOKS[id];
+  document.getElementById('script-area').innerHTML=`
+    <div class="script-tag">What the agent says</div>
+    <div class="script-box">${h.script.replace(/(\b(I noticed|I\'m aware|I completely|I wouldn|I\'ll|I know)\b)/g,'<span class="hi">$1</span>')}</div>
+    <div class="script-tag" style="margin-top:6px">Why this works</div>
+    <div class="script-why">${h.why}</div>`;
+}
+
+renderSources();
+renderFlow();
+renderHooks();
+selectSrc(0);
+selectHook(0);
+</script>

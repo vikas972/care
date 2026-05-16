@@ -1,0 +1,397 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="draw.io" version="21.0.0" type="device">
+  <diagram id="page1" name="1. Pre-Call Intelligence Flow">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="t1" value="Pre-Call Intelligence Engine — BPWealth Voice Agent" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1D1D1B;" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="900" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="t2" value="How client data is assembled and used to personalise every call — 30 seconds before dialling" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="200" y="68" width="900" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ROW 1: DATA SOURCES ========== -->
+        <mxCell id="r1label" value="DATA SOURCES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#888888;letterSpacing=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="150" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds1" value="&lt;b&gt;Demographics &amp; KYC&lt;/b&gt;&lt;br&gt;Age · Location · Risk profile · Language" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds2" value="&lt;b&gt;Trading Behaviour&lt;/b&gt;&lt;br&gt;Segments · Ticket size · P&amp;L · Activity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="260" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds3" value="&lt;b&gt;Portfolio Holdings&lt;/b&gt;&lt;br&gt;Holdings · Sector · Cash balance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="460" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds4" value="&lt;b&gt;StoxCall History&lt;/b&gt;&lt;br&gt;Tips · Conversion rate · Outcomes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="660" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds5" value="&lt;b&gt;App Behaviour&lt;/b&gt;&lt;br&gt;Watchlist · Screens · Sessions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="860" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds6" value="&lt;b&gt;Campaign Engagement&lt;/b&gt;&lt;br&gt;WhatsApp · Email · Call CTR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ds7" value="&lt;b&gt;Service &amp; Interaction&lt;/b&gt;&lt;br&gt;Complaints · RM notes · Dispositions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="148" width="180" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows down to PRE-CALL ENGINE -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#888888;" edge="1" source="ds1" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds2" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds3" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds4" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds5" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds6" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;" edge="1" source="ds7" target="eng" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ========== PRE-CALL ENGINE ========== -->
+        <mxCell id="r2label" value="PRE-CALL INTELLIGENCE ENGINE (T−30s)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#888888;letterSpacing=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="240" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="eng" value="&lt;b style='font-size:14px'&gt;Pre-Call Intelligence Engine&lt;/b&gt;&lt;br&gt;&lt;br&gt;Assembles full client context · Runs eligibility filters · Selects optimal scrip · Builds personalisation hooks · Sets call controls" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="460" y="265" width="520" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows engine to stages -->
+        <mxCell id="ae1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#314354;strokeWidth=2;" edge="1" source="eng" target="st1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ========== TIMELINE STAGES ========== -->
+        <mxCell id="r3label" value="SIGNAL FLOW TIMELINE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#888888;letterSpacing=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="368" width="250" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="st1" value="&lt;b&gt;T−30s: Data Fetch&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Pull CRM: risk, language, history&lt;br&gt;• Pull trading platform: holdings, cash&lt;br&gt;• Pull app events: watchlist, sessions&lt;br&gt;• Pull StoxCall: tips, objection history" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ast12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="st1" target="st2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="st2" value="&lt;b&gt;T−10s: Eligibility Filter&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Segment check (Cash / F&amp;O eligible?)&lt;br&gt;• Risk profile filter (block penny stocks)&lt;br&gt;• Sector over-exposure check&lt;br&gt;• Suppression flags (DND, complaint)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="290" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ast23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="st2" target="st3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="st3" value="&lt;b&gt;T−5s: Scrip Selection&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Match scrip to watchlist activity&lt;br&gt;• Calibrate ticket to cash + history&lt;br&gt;• Sector diversification check&lt;br&gt;• Set entry / target / stop-loss" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="520" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ast34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#d6b656;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="st3" target="st4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="st4" value="&lt;b&gt;T−2s: Hook Assembly&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Watchlist hook (primary opener)&lt;br&gt;• Past win reference for confidence&lt;br&gt;• Holding complement angle&lt;br&gt;• Pre-load objection rebuttals" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="750" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ast45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#9673a6;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="st4" target="st5" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="st5" value="&lt;b&gt;T=0: Call Begins&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Opens in preferred language&lt;br&gt;• Tone calibrated to RM notes&lt;br&gt;• Max 5 turns set&lt;br&gt;• Escalation trigger armed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="980" y="390" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ========== CONTEXT PACKET ========== -->
+        <mxCell id="r4label" value="CONTEXT PACKET — LOADED INTO AGENT MEMORY" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#888888;letterSpacing=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="548" width="450" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cp1" value="&lt;b&gt;Client Identity&lt;/b&gt;&lt;br&gt;Name · ID · Language&lt;br&gt;Risk profile · Segments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="cp2" value="&lt;b&gt;Portfolio Snapshot&lt;/b&gt;&lt;br&gt;Cash · Holdings&lt;br&gt;Sector exposure" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="240" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="cp3" value="&lt;b&gt;Recommendation&lt;/b&gt;&lt;br&gt;Scrip · Entry · Target&lt;br&gt;Stop-loss · Qty" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="420" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="cp4" value="&lt;b&gt;Personalisation Hooks&lt;/b&gt;&lt;br&gt;Watchlist · Past win&lt;br&gt;Complement · Objection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="600" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="cp5" value="&lt;b&gt;Call Controls&lt;/b&gt;&lt;br&gt;Suppress flags · Max turns&lt;br&gt;Escalation trigger" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="780" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="cp6" value="&lt;b&gt;Training Signal&lt;/b&gt;&lt;br&gt;A/B variant · Conv. rate&lt;br&gt;Objection tag" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="575" width="160" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from st5 to context packet -->
+        <mxCell id="a_cp" value="context packet" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#314354;strokeWidth=2;dashed=1;" edge="1" source="st5" target="cp4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="page2" name="2. Data Sources &amp; Signals">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Data Sources → Signals → Call Behaviour" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="900" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sub" value="Each data source extracts specific signals that drive specific agent behaviour during the call" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="200" y="68" width="900" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- ===== SOURCE 1: Demographics ===== -->
+        <mxCell id="s1hd" value="Demographics &amp; KYC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s1s1" value="Age 38 · Self-employed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="120" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1s2" value="Income ₹25–50L / year" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="163" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1s3" value="Risk: Moderate-aggressive" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="206" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1s4" value="Language: Gujarati preferred" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="249" width="180" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="s1u1" value="→ Shorter pitch · flexible window" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="120" width="280" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1u2" value="→ Ticket size anchored at ₹1–2L" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="163" width="280" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1u3" value="→ Allow cash + F&amp;O · block penny stocks" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="206" width="280" height="35" as="geometry" /></mxCell>
+        <mxCell id="s1u4" value="→ Open call in Hinglish / Gujarati blend" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="249" width="280" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s1hd" target="s1s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s1hd" target="s1s2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s1hd" target="s1s3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s1hd" target="s1s4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ===== SOURCE 2: Trading ===== -->
+        <mxCell id="s2hd" value="Trading Behaviour" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="320" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s2s1" value="Segments: Cash + F&amp;O" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="310" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2s2" value="Avg ticket: ₹85,000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="353" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2s3" value="60% intraday · 40% swing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="396" width="180" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2s4" value="Conversion rate: 62%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="439" width="180" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="s2u1" value="→ Can pitch F&amp;O — full product range unlocked" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="310" width="300" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2u2" value="→ Suggest 150 shares @ ₹820 = ₹1.23L" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="353" width="300" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2u3" value="→ Lead with intraday framing every call" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="396" width="300" height="35" as="geometry" /></mxCell>
+        <mxCell id="s2u4" value="→ High priority in dial queue (above avg)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="510" y="439" width="300" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="eb1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s2hd" target="s2s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s2hd" target="s2s2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s2hd" target="s2s3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s2hd" target="s2s4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ===== SOURCE 3: Portfolio ===== -->
+        <mxCell id="s3hd" value="Portfolio Holdings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="510" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s3s1" value="Holds: HDFC · Infosys · Tata Motors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="500" width="200" height="35" as="geometry" /></mxCell>
+        <mxCell id="s3s2" value="IT sector over-exposed (42%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="543" width="200" height="35" as="geometry" /></mxCell>
+        <mxCell id="s3s3" value="Cash available: ₹2,40,000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="586" width="200" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="s3u1" value="→ Tata Motors held — pitch as add-on position" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="500" width="300" height="35" as="geometry" /></mxCell>
+        <mxCell id="s3u2" value="→ Suppress IT stocks; auto/banking adds diversification" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="543" width="320" height="35" as="geometry" /></mxCell>
+        <mxCell id="s3u3" value="→ 150 shares @ ₹820 fits within available cash" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="586" width="300" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="ec1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#d6b656;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s3hd" target="s3s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ec2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#d6b656;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s3hd" target="s3s2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ec3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#d6b656;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s3hd" target="s3s3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ===== SOURCE 4: App Behaviour ===== -->
+        <mxCell id="s4hd" value="App Behaviour" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="660" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s4s1" value="Watchlist: Tata Motors (2 days ago)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="650" width="200" height="35" as="geometry" /></mxCell>
+        <mxCell id="s4s2" value="Research note opened (1 day ago)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="693" width="200" height="35" as="geometry" /></mxCell>
+        <mxCell id="s4s3" value="Drop-off: exits at order placement" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;fontSize=11;" vertex="1" parent="1"><mxGeometry x="300" y="736" width="200" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="s4u1" value="→ Primary hook: 'I noticed you were tracking this...'" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="650" width="330" height="35" as="geometry" /></mxCell>
+        <mxCell id="s4u2" value="→ Warm lead — validate their own research" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="693" width="300" height="35" as="geometry" /></mxCell>
+        <mxCell id="s4u3" value="→ CTA bypasses order screen via WhatsApp deep link" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#0000CC;" vertex="1" parent="1"><mxGeometry x="530" y="736" width="340" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="ed1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s4hd" target="s4s1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s4hd" target="s4s2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="s4hd" target="s4s3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Column headers -->
+        <mxCell id="ch1" value="DATA SOURCE" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="60" y="95" width="200" height="20" as="geometry" /></mxCell>
+        <mxCell id="ch2" value="SIGNALS EXTRACTED" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="300" y="95" width="200" height="20" as="geometry" /></mxCell>
+        <mxCell id="ch3" value="HOW USED IN THE CALL" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="510" y="95" width="300" height="20" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="page3" name="3. Live Call Personalisation Hooks">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Live Call Personalisation Hooks" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="30" width="1200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sub" value="How each data signal translates into a specific spoken line or agent behaviour during the call" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=13;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="100" y="68" width="1200" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Column headers -->
+        <mxCell id="ch1" value="SIGNAL (DATA)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="60" y="105" width="220" height="20" as="geometry" /></mxCell>
+        <mxCell id="ch2" value="AGENT SAYS" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="310" y="105" width="580" height="20" as="geometry" /></mxCell>
+        <mxCell id="ch3" value="WHY IT WORKS" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#444444;" vertex="1" parent="1"><mxGeometry x="920" y="105" width="340" height="20" as="geometry" /></mxCell>
+
+        <!-- Hook 1: Watchlist -->
+        <mxCell id="h1sig" value="&lt;b&gt;Watchlist signal&lt;/b&gt;&lt;br&gt;Tata Motors added&lt;br&gt;2 days ago" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="135" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h1scr" value="&quot;Rajeshbhai, I noticed you were looking at Tata Motors on the app two days ago — and our research team has put out a specific note on it today. It will only take 60 seconds.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4fd;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="135" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h1why" value="Makes it feel like a direct response to something the client was already thinking — not a cold call." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="135" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h1a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h1sig" target="h1scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 2: Past win -->
+        <mxCell id="h2sig" value="&lt;b&gt;Past win reference&lt;/b&gt;&lt;br&gt;HDFC Bank call&lt;br&gt;+8.2% in March" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="218" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h2scr" value="&quot;You did really well on the HDFC Bank call we shared in March — similar setup here: tight stop-loss, clear catalyst, short time horizon. That is what makes this compelling.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2f0e2;strokeColor=#82b366;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="218" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h2why" value="References a specific, real outcome the client experienced — far more credible than generic claims about track record." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="218" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h2a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h2sig" target="h2scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 3: Holding complement -->
+        <mxCell id="h3sig" value="&lt;b&gt;Current holding&lt;/b&gt;&lt;br&gt;Client already holds&lt;br&gt;Tata Motors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="301" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h3scr" value="&quot;You are already in Tata Motors, so you know the story. This is an opportunity to add to a position you already believe in, at what our team thinks is a strong re-entry point before the EV data drops next week.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffde8;strokeColor=#d6b656;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="301" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h3why" value="Reframes from 'buy something new' (risky) to 'add to something you own' (familiar). Reduces perceived risk." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="301" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h3a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#d6b656;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h3sig" target="h3scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 4: Ticket size -->
+        <mxCell id="h4sig" value="&lt;b&gt;Cash + ticket size&lt;/b&gt;&lt;br&gt;₹2.4L cash · ticket ₹85K&lt;br&gt;→ suggest 150 shares" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="384" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h4scr" value="&quot;At today's price of ₹820, 150 shares is ₹1.23 lakhs — that is within your normal range and leaves you with comfortable margin. You are not stretching at all for this one.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2f0e2;strokeColor=#82b366;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="384" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h4why" value="Specific numbers calibrated to this client eliminate the 'I need to check my cash' objection before it is raised." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="384" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h4a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#82b366;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h4sig" target="h4scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 5: Volatility objection -->
+        <mxCell id="h5sig" value="&lt;b&gt;Objection pattern&lt;/b&gt;&lt;br&gt;Historically raises&lt;br&gt;volatility concern" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="467" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h5scr" value="&quot;I completely understand — this market feels unpredictable. But the stop-loss is at ₹805, so maximum downside on 150 shares is ₹2,250. The upside to target is ₹9,000. The asymmetry is firmly in your favour.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde8e8;strokeColor=#b85450;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="467" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h5why" value="Rebuttal is pre-loaded from client's objection history. Response is fast, specific, and data-backed — not generic." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="467" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h5a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#b85450;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h5sig" target="h5scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 6: Loss history -->
+        <mxCell id="h6sig" value="&lt;b&gt;Loss history&lt;/b&gt;&lt;br&gt;Midcap IT call -3.1%&lt;br&gt;6 weeks ago" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h6scr" value="&quot;I am aware the midcap IT call a few weeks ago did not go the way we wanted — I will not pretend otherwise. What is different here: different sector, dated catalyst, not a macro view. I would not call if I were not confident.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede8f4;strokeColor=#9673a6;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="550" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h6why" value="Acknowledging the loss before the client raises it builds credibility. Suppressing it destroys trust." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="550" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h6a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#9673a6;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h6sig" target="h6scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 7: Language -->
+        <mxCell id="h7sig" value="&lt;b&gt;Language preference&lt;/b&gt;&lt;br&gt;Gujarati registered&lt;br&gt;Hinglish in past calls" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="633" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h7scr" value="Opens in Hinglish: &quot;Namaste Rajeshbhai, aaj ek specific opportunity hai Tata Motors mein...&quot; Switches on client signal: &quot;Tamne Gujarati maa vaato kari sakhu? Bilkul, mari pan suvida che.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4fd;strokeColor=#6c8ebf;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="633" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h7why" value="Starting in Hinglish (natural blend) feels more comfortable. Switching on request shows respect, builds rapport." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="633" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h7a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6c8ebf;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h7sig" target="h7scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Hook 8: Drop-off -->
+        <mxCell id="h8sig" value="&lt;b&gt;App drop-off pattern&lt;/b&gt;&lt;br&gt;Exits at order&lt;br&gt;placement screen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="716" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h8scr" value="&quot;If you would like to proceed, I will send you a WhatsApp right now with entry, target, stop-loss, and a link. Tap it and your dealer has everything — you do not have to navigate to the order screen yourself.&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;verticalAlign=middle;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="310" y="716" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="h8why" value="App data shows hesitation at order placement. The CTA bypasses that friction point via WhatsApp deep link." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="920" y="716" width="340" height="65" as="geometry" /></mxCell>
+        <mxCell id="h8a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="h8sig" target="h8scr" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="page4" name="4. Personalisation Tiers">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Personalisation Tiers — Pre-call · Live Call · Post-call" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="30" width="1100" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Client profile bar -->
+        <mxCell id="profile" value="Client: Rajesh Mehta · BPW-40291  |  Language: Gujarati/Hinglish  |  Risk: Moderate-aggressive  |  Conversion: 62%  |  Cash: ₹2,40,000  |  Status: Active" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="1180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Tier 1 -->
+        <mxCell id="t1hd" value="TIER 1 — PRE-CALL (T−30s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="360" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="t1s1" value="Pull risk profile, holdings, cash, app activity from CRM + data lake" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="215" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t1s2" value="Run eligibility filter — only pitch segments client is cleared for" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="258" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t1s3" value="Select scrip matching risk appetite and available cash" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="301" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t1s4" value="Detect preferred language from CRM + app + past call notes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="344" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t1s5" value="Check suppression flags: DND, open complaint, recent loss" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="387" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t1s6" value="Pre-load top 3 objection rebuttals based on client's objection history" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fff9;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="430" width="360" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="t1tags" value="Sources: CRM · Data lake · Trading platform · RMS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="475" width="360" height="30" as="geometry" /></mxCell>
+
+        <!-- Tier 2 -->
+        <mxCell id="t2hd" value="TIER 2 — LIVE CALL (real-time)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="160" width="360" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="t2s1" value="Open with personalised hook: watchlist, past win, or market event" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="215" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t2s2" value="Reference current holding — position tip as complementary, not competing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="258" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t2s3" value="Deliver exact ticket size calibrated to cash and typical position size" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="301" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t2s4" value="Switch language instantly if client signals preference mid-call" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="344" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t2s5" value="Personalised objection rebuttal using client's own history" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="387" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t2s6" value="Sentiment monitor in parallel — escalate on 2× negative signal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5faff;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="460" y="430" width="360" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="t2tags" value="Tools: Context packet · LangGraph state · Redis session memory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="460" y="475" width="360" height="30" as="geometry" /></mxCell>
+
+        <!-- Tier 3 -->
+        <mxCell id="t3hd" value="TIER 3 — POST-CALL (feedback loop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="160" width="360" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="t3s1" value="Log outcome (converted / callback / declined) to CRM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="215" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t3s2" value="Tag objection type — updates client objection profile for next call" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="258" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t3s3" value="Update StoxCall participation: tip outcome, acted vs ignored" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="301" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t3s4" value="Send WhatsApp: entry, target, SL, research note, callback confirmation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="344" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t3s5" value="Feed transcript + outcome into A/B test framework" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="387" width="360" height="35" as="geometry" /></mxCell>
+        <mxCell id="t3s6" value="Re-score client conversion probability for next recommendation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffef5;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="860" y="430" width="360" height="35" as="geometry" /></mxCell>
+
+        <mxCell id="t3tags" value="Tools: CRM write · WhatsApp API · Kafka event stream" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="860" y="475" width="360" height="30" as="geometry" /></mxCell>
+
+        <!-- Arrows between tiers -->
+        <mxCell id="t12a" value="feeds into" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;strokeWidth=2;dashed=1;fontSize=11;" edge="1" source="t1hd" target="t2hd" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t23a" value="feeds into" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#888888;strokeWidth=2;dashed=1;fontSize=11;" edge="1" source="t2hd" target="t3hd" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Feedback loop arrow -->
+        <mxCell id="fbloop" value="next call is smarter" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#888888;strokeWidth=2;dashed=1;fontSize=11;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" edge="1" source="t3tags" target="t1tags" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="560" />
+              <mxPoint x="240" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Fine-tuning box -->
+        <mxCell id="fthd" value="Fine-tuning from 12+ months of call recordings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="600" width="1160" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="ft1" value="Step 1: Transcribe all recordings (Whisper / Deepgram batch)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="60" y="655" width="265" height="45" as="geometry" /></mxCell>
+        <mxCell id="ft2" value="Step 2: Label by outcome + objection type per call" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="345" y="655" width="265" height="45" as="geometry" /></mxCell>
+        <mxCell id="ft3" value="Step 3: LoRA fine-tune on objection → rebuttal pairs (Llama 3.1 8B)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="630" y="655" width="265" height="45" as="geometry" /></mxCell>
+        <mxCell id="ft4" value="Step 4: Shadow mode eval vs human callers · target 67% conv. rate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1"><mxGeometry x="915" y="655" width="305" height="45" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
