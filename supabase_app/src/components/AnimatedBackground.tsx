@@ -1,4 +1,5 @@
 import { usePointerPosition } from "../hooks/usePointerPosition";
+import SoundWaveBackground from "./SoundWaveBackground";
 
 type Blob = { color: string; size: string; top: string; left: string; parallax: number; delay: string };
 
@@ -14,7 +15,8 @@ export default function AnimatedBackground({ className = "" }: { className?: str
 
   return (
     <div className={`pointer-events-none fixed inset-0 overflow-hidden ${className}`} aria-hidden>
-      <div className="absolute inset-0 bg-grid-fade opacity-40" />
+      <SoundWaveBackground />
+      <div className="absolute inset-0 bg-grid-fade opacity-25" />
 
       {blobs.map((b, i) => (
         <div

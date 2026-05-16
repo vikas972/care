@@ -117,6 +117,53 @@ body {
   .loading-orb {
     @apply h-10 w-10 rounded-full border-2 border-teal-500/30 border-t-teal-400 animate-spin;
   }
+
+  /* Agent editor form */
+  .form-input {
+    @apply w-full rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-2.5 text-slate-100 placeholder:text-slate-600 input-glow;
+  }
+
+  .form-textarea {
+    @apply w-full resize-y rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 text-slate-100 placeholder:text-slate-600 input-glow;
+  }
+
+  .form-file {
+    @apply block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-white/[0.08] file:px-3 file:py-2 file:text-sm file:text-slate-200 hover:file:bg-white/[0.12];
+  }
+
+  .form-btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-semibold text-[#041210] shadow-lg shadow-teal-900/30 transition-all duration-200 hover:from-teal-400 hover:to-cyan-400 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100;
+  }
+
+  .form-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white;
+  }
+
+  .form-chip {
+    @apply rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:border-teal-500/30 hover:bg-teal-500/10 hover:text-teal-200;
+  }
+
+  .form-dropzone {
+    @apply flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/[0.02] px-6 py-8 text-center transition hover:border-teal-500/30 hover:bg-teal-500/[0.04];
+  }
+
+  .form-dropzone-active {
+    @apply border-teal-500/40 bg-teal-500/[0.06];
+  }
+
+  .form-dropzone-drag {
+    @apply border-teal-400/50 bg-teal-500/10 scale-[1.01];
+  }
+
+  .form-actions-bar {
+    @apply sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center gap-3 border-t border-white/[0.08] bg-[#0b0b0d]/95 px-4 py-4 backdrop-blur-md md:-mx-8 md:px-8;
+  }
+
+  .sound-wave-root {
+    @apply opacity-90;
+    mask-image: linear-gradient(to top, black 15%, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 15%, black 50%, transparent 100%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,8 +180,9 @@ body {
   .animate-wave-bar,
   .animate-wave-bar-fast,
   .animate-spin-slow,
-  .glow-btn-shine {
-    animation: none !important;
+  .glow-btn-shine,
+  .sound-wave-root {
+    opacity: 0.25 !important;
   }
 
   .tilt-card,

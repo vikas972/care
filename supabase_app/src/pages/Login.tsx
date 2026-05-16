@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AnimatedBackground from "../components/AnimatedBackground";
 import { Reveal } from "../components/Reveal";
 import { VoiceHeroVisual } from "../components/VoiceOrb";
@@ -13,6 +13,27 @@ const features = [
   "Connect inbound and outbound phone lines via SIP",
 ];
 
+/** Production URL for email confirm links — must match Supabase Auth redirect allow list. */
+function authRedirectBase(): string {
+  const fromEnv = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  if (typeof window !== "undefined") return window.location.origin;
+  return "";
+}
+
+function parseAuthHashErrors(): string | null {
+  const hash = window.location.hash.replace(/^#/, "");
+  if (!hash || !hash.includes("error=")) return null;
+  const params = new URLSearchParams(hash);
+  const desc = params.get("error_description")?.replace(/\+/g, " ");
+  const code = params.get("error_code");
+  if (desc) return decodeURIComponent(desc);
+  if (code === "otp_expired") {
+    return "This confirmation link has expired. Sign up again or request a new confirmation email.";
+  }
+  return params.get("error") ?? "Email link is invalid or has expired.";
+}
+
 export default function Login() {
   const [mode, setMode] = useState<EmailMode | "phone">("signin");
   const [email, setEmail] = useState("");
@@ -24,6 +45,14 @@ export default function Login() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    const hashErr = parseAuthHashErrors();
+    if (hashErr) {
+      setErr(hashErr);
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
+
   async function submitEmail(e: FormEvent) {
     e.preventDefault();
     setErr(null);
@@ -31,9 +60,16 @@ export default function Login() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const redirectTo = `${authRedirectBase()}/login`;
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: redirectTo },
+        });
         if (error) throw error;
-        setMsg("Check your email to confirm your account if required by your Supabase project.");
+        setMsg(
+          `Check your email to confirm your account. The link will return you to ${redirectTo || "this site"}.`,
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;

@@ -57,6 +57,18 @@ export default {
           "0%, 100%": { opacity: "0.5" },
           "50%": { opacity: "1" },
         },
+        "wave-curve-1": {
+          "0%, 100%": { transform: "translateX(0) translateY(0)" },
+          "50%": { transform: "translateX(-2.5%) translateY(-8px)" },
+        },
+        "wave-curve-2": {
+          "0%, 100%": { transform: "translateX(0) translateY(0)" },
+          "50%": { transform: "translateX(2%) translateY(6px)" },
+        },
+        "wave-curve-3": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(-1.5%)" },
+        },
       },
       animation: {
         "pulse-ring": "pulse-ring 3s ease-in-out infinite",
@@ -69,6 +81,9 @@ export default {
         "spin-slow": "spin-slow 24s linear infinite",
         "fade-up": "fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "glow-pulse": "glow-pulse 2.5s ease-in-out infinite",
+        "wave-curve-1": "wave-curve-1 14s ease-in-out infinite",
+        "wave-curve-2": "wave-curve-2 18s ease-in-out infinite",
+        "wave-curve-3": "wave-curve-3 22s ease-in-out infinite",
       },
     },
   },
