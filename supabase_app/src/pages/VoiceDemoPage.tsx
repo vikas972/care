@@ -1,17 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ConnectionState,
   LocalAudioTrack,
+  RemoteParticipant,
+  RemoteTrack,
   Room,
   RoomEvent,
   Track,
   createLocalAudioTrack,
 } from "livekit-client";
+import VoiceCallOrb from "../components/VoiceCallOrb";
 import { useAuth } from "../contexts/AuthContext";
 import { useVoiceAgents } from "../hooks/useVoiceAgents";
 import { apiUrl, parseFastApiDetail } from "../lib/api";
 
+type CallPhase = "idle" | "connecting" | "live";
 type LogLine = { t: number; msg: string };
 
 export default function VoiceDemoPage() {
@@ -21,20 +25,23 @@ export default function VoiceDemoPage() {
 
   const agentId = searchParams.get("agent") ?? "";
 
-  const [url, setUrl] = useState("");
-  const [token, setToken] = useState("");
+  const [phase, setPhase] = useState<CallPhase>("idle");
   const [roomName, setRoomName] = useState("");
-  const [status, setStatus] = useState<ConnectionState>(ConnectionState.Disconnected);
   const [err, setErr] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogLine[]>([]);
-  const [micOn, setMicOn] = useState(false);
-  const [starting, setStarting] = useState(false);
+  const [localLevel, setLocalLevel] = useState(0);
+  const [agentSpeaking, setAgentSpeaking] = useState(false);
+  const [remoteCount, setRemoteCount] = useState(0);
+  const [remoteAudioCount, setRemoteAudioCount] = useState(0);
+  const [showLogs, setShowLogs] = useState(false);
 
   const roomRef = useRef<Room | null>(null);
   const micTrackRef = useRef<LocalAudioTrack | null>(null);
-  const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
-
-  const canConnect = useMemo(() => !!url && !!token, [url, token]);
+  const remoteAudioContainerRef = useRef<HTMLDivElement | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const levelRafRef = useRef(0);
+  const attachedTracksRef = useRef<Set<string>>(new Set());
 
   const selectedAgent = useMemo(() => rows.find((r) => r.id === agentId), [rows, agentId]);
 
@@ -45,11 +52,162 @@ export default function VoiceDemoPage() {
     }
   }, [loading, rows, agentId, setSearchParams]);
 
-  function addLog(msg: string) {
-    setLogs((x) => [...x.slice(-199), { t: Date.now(), msg }]);
+  const addLog = useCallback((msg: string) => {
+    setLogs((x) => [...x.slice(-99), { t: Date.now(), msg }]);
+  }, []);
+
+  function stopLevelMeter() {
+    if (levelRafRef.current) cancelAnimationFrame(levelRafRef.current);
+    levelRafRef.current = 0;
+    setLocalLevel(0);
+    if (audioCtxRef.current) {
+      void audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
+    }
+    analyserRef.current = null;
   }
 
-  async function startDemoSession() {
+  function startLevelMeter(track: LocalAudioTrack) {
+    stopLevelMeter();
+    const mediaTrack = track.mediaStreamTrack;
+    if (!mediaTrack) return;
+
+    const ctx = new AudioContext();
+    audioCtxRef.current = ctx;
+    const source = ctx.createMediaStreamSource(new MediaStream([mediaTrack]));
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    analyserRef.current = analyser;
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const tick = () => {
+      analyser.getByteFrequencyData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) sum += data[i];
+      const avg = sum / data.length / 255;
+      setLocalLevel((prev) => prev * 0.6 + avg * 0.4);
+      levelRafRef.current = requestAnimationFrame(tick);
+    };
+    void ctx.resume().then(() => {
+      levelRafRef.current = requestAnimationFrame(tick);
+    });
+  }
+
+  function syncRemoteCounts(room: Room) {
+    setRemoteCount(room.remoteParticipants.size);
+    let audio = 0;
+    room.remoteParticipants.forEach((p) => {
+      p.audioTrackPublications.forEach((pub) => {
+        if (pub.track) audio += 1;
+      });
+    });
+    setRemoteAudioCount(audio);
+  }
+
+  function attachRemoteAudio(track: RemoteTrack, participant: RemoteParticipant) {
+    if (track.kind !== Track.Kind.Audio) return;
+    const key = `${participant.identity}-${track.mediaStreamID}`;
+    if (attachedTracksRef.current.has(key)) return;
+
+    const container = remoteAudioContainerRef.current ?? document.body;
+
+    const el = track.attach() as HTMLAudioElement;
+    el.autoplay = true;
+    el.setAttribute("playsinline", "true");
+    el.volume = 1;
+    el.dataset.participant = participant.identity;
+    el.style.position = "fixed";
+    el.style.width = "0";
+    el.style.height = "0";
+    el.style.opacity = "0";
+    el.style.pointerEvents = "none";
+    container.appendChild(el);
+    attachedTracksRef.current.add(key);
+    setRemoteAudioCount((n) => n + 1);
+
+    void el.play().catch(() => {
+      addLog("browser blocked agent audio — tap the mic again to unlock");
+    });
+    addLog(`hearing ${participant.identity}`);
+  }
+
+  function attachExistingRemoteAudio(room: Room) {
+    room.remoteParticipants.forEach((participant) => {
+      participant.audioTrackPublications.forEach((pub) => {
+        if (pub.track) attachRemoteAudio(pub.track, participant);
+      });
+    });
+  }
+
+  function setupRoomHandlers(room: Room) {
+    room
+      .on(RoomEvent.ConnectionStateChanged, (s) => {
+        if (s === ConnectionState.Connected) setPhase("live");
+        if (s === ConnectionState.Disconnected) {
+          setPhase("idle");
+          setRemoteCount(0);
+          setRemoteAudioCount(0);
+        }
+      })
+      .on(RoomEvent.ParticipantConnected, (p) => {
+        addLog(`joined: ${p.identity}`);
+        syncRemoteCounts(room);
+        attachExistingRemoteAudio(room);
+      })
+      .on(RoomEvent.ParticipantDisconnected, () => syncRemoteCounts(room))
+      .on(RoomEvent.TrackSubscribed, (track, _pub, participant) => {
+        attachRemoteAudio(track, participant);
+        syncRemoteCounts(room);
+      })
+      .on(RoomEvent.TrackUnsubscribed, (track, _pub, participant) => {
+        attachedTracksRef.current.forEach((k) => {
+          if (k.startsWith(`${participant.identity}-`)) attachedTracksRef.current.delete(k);
+        });
+        try {
+          const els = track.detach();
+          els.forEach((el) => el.remove());
+        } catch {
+          /* ignore */
+        }
+      })
+      .on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+        const localId = room.localParticipant.identity;
+        setAgentSpeaking(speakers.some((s) => s.identity !== localId));
+      });
+  }
+
+  async function endCall() {
+    setErr(null);
+    stopLevelMeter();
+    setAgentSpeaking(false);
+    setRemoteCount(0);
+    setRemoteAudioCount(0);
+    attachedTracksRef.current.clear();
+
+    if (remoteAudioContainerRef.current) {
+      remoteAudioContainerRef.current.innerHTML = "";
+    }
+
+    try {
+      if (micTrackRef.current) {
+        micTrackRef.current.stop();
+        micTrackRef.current = null;
+      }
+      if (roomRef.current) {
+        roomRef.current.disconnect();
+        roomRef.current = null;
+      }
+    } catch {
+      /* ignore */
+    }
+
+    setRoomName("");
+    setPhase("idle");
+    addLog("call ended");
+  }
+
+  async function startCall() {
     setErr(null);
     if (!agentId) {
       setErr("Choose an agent above.");
@@ -60,8 +218,18 @@ export default function VoiceDemoPage() {
       setErr("Not signed in.");
       return;
     }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setErr(
+        window.isSecureContext
+          ? "Microphone not available in this browser."
+          : "Microphone requires HTTPS or localhost.",
+      );
+      return;
+    }
 
-    setStarting(true);
+    setPhase("connecting");
+    addLog("starting session…");
+
     try {
       const res = await fetch(apiUrl("/voice/livekit/demo-session"), {
         method: "POST",
@@ -79,132 +247,86 @@ export default function VoiceDemoPage() {
       };
       if (!res.ok) throw new Error(parseFastApiDetail(body));
       if (!body.token || !body.url || !body.room) throw new Error("Bad response from demo-session");
-      setUrl(body.url);
-      setToken(body.token);
+
       setRoomName(body.room);
-      addLog(`session ready — room ${body.room}`);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to start demo");
-      addLog(`error: ${e instanceof Error ? e.message : "start failed"}`);
-    } finally {
-      setStarting(false);
-    }
-  }
+      addLog(`room ${body.room}`);
 
-  async function connect() {
-    setErr(null);
-    if (!canConnect) return;
-    try {
-      const room = new Room();
+      const room = new Room({
+        adaptiveStream: true,
+        dynacast: true,
+      });
       roomRef.current = room;
-      room
-        .on(RoomEvent.ConnectionStateChanged, (s) => setStatus(s))
-        .on(RoomEvent.ParticipantConnected, (p) => addLog(`participant joined: ${p.identity}`))
-        .on(RoomEvent.ParticipantDisconnected, (p) => addLog(`participant left: ${p.identity}`))
-        .on(RoomEvent.TrackSubscribed, (track, _pub, participant) => {
-          if (track.kind !== Track.Kind.Audio) return;
-          addLog(`audio subscribed from ${participant.identity}`);
-          const el = remoteAudioRef.current;
-          if (!el) return;
-          track.attach(el);
-          el.play().catch(() => {});
-        })
-        .on(RoomEvent.TrackUnsubscribed, (track) => {
-          try {
-            track.detach();
-          } catch {
-            // ignore
-          }
-        });
+      setupRoomHandlers(room);
+
       addLog("connecting…");
-      await room.connect(url, token, { autoSubscribe: true });
-      addLog("connected");
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to connect");
-      addLog(`error: ${e instanceof Error ? e.message : "connect failed"}`);
-    }
-  }
+      await room.connect(body.url, body.token, { autoSubscribe: true });
 
-  async function disconnect() {
-    setErr(null);
-    setMicOn(false);
-    try {
-      if (micTrackRef.current) {
-        micTrackRef.current.stop();
-        micTrackRef.current = null;
-      }
-      if (roomRef.current) {
-        roomRef.current.disconnect();
-        roomRef.current = null;
-      }
-      addLog("disconnected");
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to disconnect");
-    }
-  }
+      await room.startAudio();
+      addLog("audio unlocked");
 
-  async function enableMic() {
-    setErr(null);
-    const room = roomRef.current;
-    if (!room) return;
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setErr(
-        window.isSecureContext
-          ? "This browser does not expose the microphone API (getUserMedia)."
-          : "Microphone needs a secure context: use HTTPS (or localhost). Plain http:// on a public host blocks getUserMedia — add TLS (e.g. Let’s Encrypt with nginx).",
-      );
-      return;
-    }
-    try {
-      const track = await createLocalAudioTrack({
+      attachExistingRemoteAudio(room);
+      syncRemoteCounts(room);
+
+      const waitMs = 20_000;
+      const stepMs = 500;
+      for (let waited = 0; waited < waitMs; waited += stepMs) {
+        if (room.remoteParticipants.size > 0) break;
+        await new Promise((r) => setTimeout(r, stepMs));
+      }
+      syncRemoteCounts(room);
+      attachExistingRemoteAudio(room);
+      if (room.remoteParticipants.size === 0) {
+        addLog(
+          "no agent joined — confirm LiveKit worker 'my-agent' is deployed (lk agent list) and matches agent LiveKit name",
+        );
+      }
+
+      const mic = await createLocalAudioTrack({
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true,
       });
-      micTrackRef.current = track;
-      await room.localParticipant.publishTrack(track, { source: Track.Source.Microphone });
-      setMicOn(true);
-      addLog("microphone published");
+      micTrackRef.current = mic;
+      await room.localParticipant.publishTrack(mic, { source: Track.Source.Microphone });
+      startLevelMeter(mic);
+
+      setPhase("live");
+      addLog("live — speak now");
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to enable mic");
+      const msg = e instanceof Error ? e.message : "Call failed";
+      const hint =
+        msg === "Failed to fetch"
+          ? "Cannot reach API. Run backend on :8001 and frontend with npm run dev (VITE_API_BASE_URL empty)."
+          : msg;
+      setErr(hint);
+      addLog(`error: ${hint}`);
+      await endCall();
     }
   }
 
-  async function disableMic() {
-    setErr(null);
-    const room = roomRef.current;
-    const track = micTrackRef.current;
-    if (!room || !track) {
-      setMicOn(false);
-      return;
-    }
-    try {
-      room.localParticipant.unpublishTrack(track);
-      track.stop();
-      micTrackRef.current = null;
-      setMicOn(false);
-      addLog("microphone stopped");
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Failed to disable mic");
+  async function toggleCall() {
+    if (phase === "live" || phase === "connecting") {
+      await endCall();
+    } else {
+      await startCall();
     }
   }
 
   useEffect(() => {
     return () => {
-      void disconnect();
+      void endCall();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const connected = status === ConnectionState.Connected;
+  const orbDisabled = !session || !agentId || loading || rows.length === 0;
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-studio-heading">Voice demo</h1>
-        <p className="mt-2 max-w-2xl text-sm text-studio-secondary">
-          Browser WebRTC session: FastAPI starts a LiveKit room and dispatches your worker with merged metadata (
-          <code className="text-studio-muted">skip_opening</code> for chat-style demo).
+        <h1 className="font-display text-3xl text-white">Voice demo</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-500">
+          Tap the microphone once to talk. Session, connection, and audio start automatically.
         </p>
       </div>
 
@@ -217,14 +339,14 @@ export default function VoiceDemoPage() {
         </div>
       ) : null}
 
-      <section className="studio-card rounded-2xl border border-studio-border bg-gradient-to-b from-ink-900/90 to-ink-950/80 p-6 shadow-xl shadow-black/20">
-        <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-studio-muted">Agent</label>
+      <section className="rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#14141c]/90 to-[#101014]/90 p-5">
+        <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-600">Agent</label>
         <div className="flex flex-wrap items-center gap-3">
           <select
             value={agentId}
-            disabled={loading || rows.length === 0}
+            disabled={loading || rows.length === 0 || phase !== "idle"}
             onChange={(e) => setSearchParams(e.target.value ? { agent: e.target.value } : {})}
-            className="min-w-[240px] rounded-xl border border-studio-border bg-studio-input px-4 py-3 text-sm text-studio-heading focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="min-w-[220px] rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 disabled:opacity-50"
           >
             {rows.length === 0 ? (
               <option value="">No agents — create one first</option>
@@ -236,20 +358,18 @@ export default function VoiceDemoPage() {
               ))
             )}
           </select>
-          <Link
-            to="/studio/agents/new"
-            className="rounded-xl border border-studio-border-strong px-4 py-3 text-sm text-studio-text hover:bg-studio-hover"
-          >
-            New agent
-          </Link>
           {selectedAgent ? (
             <Link
               to={`/studio/agents/${selectedAgent.id}`}
-              className="rounded-xl border border-emerald-500/30 px-4 py-3 text-sm text-emerald-200 hover:bg-emerald-950/30"
+              className="text-sm text-teal-500 hover:text-teal-400"
             >
-              Edit config
+              Edit agent
             </Link>
-          ) : null}
+          ) : (
+            <Link to="/studio/agents/new" className="text-sm text-slate-500 hover:text-slate-300">
+              Create agent
+            </Link>
+          )}
         </div>
       </section>
 
@@ -257,79 +377,72 @@ export default function VoiceDemoPage() {
         <div className="rounded-xl border border-red-500/30 bg-red-950/35 px-4 py-3 text-sm text-red-200">{err}</div>
       ) : null}
 
-      <section className="studio-card rounded-2xl border border-studio-border bg-studio-surface/70 p-6 sm:p-8">
-        <div className="mb-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={starting || connected || !session || !agentId}
-            onClick={() => void startDemoSession()}
-            className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-emerald-900/30 hover:from-emerald-500 hover:to-teal-500 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {starting ? "Starting…" : "Start session"}
-          </button>
-          {!connected ? (
-            <button
-              type="button"
-              onClick={() => void connect()}
-              disabled={!canConnect || starting}
-              className="rounded-xl border border-studio-border-strong px-5 py-2.5 text-sm text-studio-text hover:bg-studio-hover disabled:opacity-40"
-            >
-              Connect
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => void disconnect()}
-              className="rounded-xl border border-white/20 px-5 py-2.5 text-sm text-studio-text hover:bg-studio-hover"
-            >
-              Disconnect
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => (micOn ? void disableMic() : void enableMic())}
-            disabled={!connected}
-            className="rounded-xl bg-studio-hover px-5 py-2.5 text-sm text-white hover:bg-white/15 disabled:opacity-40"
-          >
-            {micOn ? "Mute mic" : "Unmute mic"}
-          </button>
-        </div>
+      <section className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-[#12121a] to-[#0a0a0e] px-6 py-10 sm:py-14">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_80%,rgba(45,212,191,0.08),transparent)]" />
 
-        {roomName ? (
-          <p className="mb-4 font-mono text-xs text-studio-muted">
-            Room <span className="text-studio-text">{roomName}</span>
-          </p>
+        <VoiceCallOrb
+          phase={phase}
+          agentSpeaking={agentSpeaking}
+          localLevel={localLevel}
+          disabled={orbDisabled}
+          onToggle={() => void toggleCall()}
+        />
+
+        {phase === "live" ? (
+          <div className="relative mt-4 space-y-1 text-center text-xs">
+            {roomName ? (
+              <p className="font-mono text-[11px] text-slate-600">Room {roomName}</p>
+            ) : null}
+            {remoteCount === 0 ? (
+              <p className="text-amber-400/90">
+                Waiting for agent worker… (check LiveKit name is <code className="text-amber-200">my-agent</code>{" "}
+                and worker is deployed)
+              </p>
+            ) : remoteAudioCount === 0 ? (
+              <p className="text-amber-400/90">Agent connected — waiting for audio track…</p>
+            ) : (
+              <p className="text-teal-500/80">
+                Agent in room · {remoteAudioCount} audio track{remoteAudioCount === 1 ? "" : "s"}
+              </p>
+            )}
+          </div>
         ) : null}
 
-        <p className="mb-4 text-sm text-studio-muted">
-          Status: <span className={connected ? "text-emerald-400" : "text-studio-text"}>{status}</span>
-        </p>
-
-        <div className="rounded-xl border border-studio-border-subtle bg-studio-input/50 p-4">
-          <div className="mb-2 text-sm font-medium text-studio-text">Agent audio</div>
-          <audio ref={remoteAudioRef} controls className="w-full rounded-lg" />
-        </div>
+        {/* Remote audio elements (hidden, required for playback) */}
+        <div ref={remoteAudioContainerRef} className="sr-only" aria-hidden />
       </section>
 
-      <section className="studio-card rounded-2xl border border-studio-border bg-studio-surface/60 p-6">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg text-studio-heading">Logs</h2>
-          <button type="button" onClick={() => setLogs([])} className="text-xs text-studio-muted hover:text-studio-text">
-            Clear
-          </button>
-        </div>
-        <div className="max-h-52 overflow-auto rounded-lg border border-white/[0.05] bg-studio-input/60 p-3 font-mono text-xs text-studio-secondary">
-          {logs.length === 0 ? (
-            <span className="text-studio-faint">No logs yet.</span>
-          ) : (
-            logs.map((l) => (
-              <div key={l.t} className="whitespace-pre-wrap break-words">
-                [{new Date(l.t).toLocaleTimeString()}] {l.msg}
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => setShowLogs((v) => !v)}
+          className="text-xs text-slate-600 hover:text-slate-400"
+        >
+          {showLogs ? "Hide" : "Show"} connection log
+        </button>
+      </div>
+
+      {showLogs ? (
+        <section className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-slate-400">Log</h2>
+            <button type="button" onClick={() => setLogs([])} className="text-xs text-slate-600 hover:text-slate-300">
+              Clear
+            </button>
+          </div>
+          <div className="max-h-40 overflow-auto font-mono text-xs text-slate-500">
+            {logs.length === 0 ? (
+              <span className="text-slate-600">No logs yet.</span>
+            ) : (
+              logs.map((l) => (
+                <div key={l.t} className="whitespace-pre-wrap break-words py-0.5">
+                  [{new Date(l.t).toLocaleTimeString()}] {l.msg}
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

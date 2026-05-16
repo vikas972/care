@@ -222,7 +222,10 @@ async def my_agent(ctx: JobContext):
         )
     else:
         packet = build_context_packet(payload)
-        call_state = CallState(packet=packet)
+        call_state = CallState(
+            packet=packet,
+            skip_opening=bool(payload.get("skip_opening")),
+        )
         session = AgentSession(
             stt=inference.STT(model=stt_model, language=stt_language),
             llm=inference.LLM(model=llm_model),

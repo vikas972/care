@@ -77,7 +77,14 @@ def _merge_dispatch_metadata(row: dict[str, Any], *, demo: bool) -> dict[str, An
         base["opening_script"] = opening.strip()
 
     if demo:
-        base["skip_opening"] = True
+        # Web demo: use the simple Assistant path with per-agent instructions from Supabase.
+        base["legacy_assistant"] = True
+        base["skip_opening"] = False
+        base["two_step"] = False
+        if not str(base.get("opening_script") or "").strip():
+            base["opening_script"] = (
+                "Greet the user in one or two short spoken sentences and ask how you can help."
+            )
 
     return base
 

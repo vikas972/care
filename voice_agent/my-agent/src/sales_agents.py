@@ -140,6 +140,7 @@ class CallState:
     last_disposition: str = ""
     pitch_delivered: bool = False
     hook_opener_played: bool = False
+    skip_opening: bool = False
 
 
 def _playbook_snippet(state: CallState, category: str) -> str:
@@ -259,6 +260,8 @@ class HookAgent(SalesCallAgent):
         )
 
     async def on_enter(self) -> None:
+        if self._state.skip_opening:
+            return
         script = (self._state.packet.hook_opening or DEFAULT_HOOK_OPENING).strip()
         pkt = format_packet_for_instructions(self._state.packet)
         last_user = latest_user_text_from_history(self.session.history())

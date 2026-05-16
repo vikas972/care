@@ -11,4 +11,11 @@ export default defineConfig({
       "/health": { target: "http://127.0.0.1:8001", changeOrigin: true },
     },
   },
+  preview: {
+    port: 5174,
+    proxy: {
+      "/voice": { target: "http://127.0.0.1:8001", changeOrigin: true },
+      "/health": { target: "http://127.0.0.1:8001", changeOrigin: true },
+    },
+  },
 });
