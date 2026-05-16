@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: supabase_app/supabase/backend
+        working-directory: supabase_app/platform/api
     steps:
       - uses: actions/checkout@v4
 

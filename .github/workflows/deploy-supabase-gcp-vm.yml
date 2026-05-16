@@ -6,7 +6,7 @@
 #   sudo usermod -aG docker "$USER" && newgrp docker
 #
 # Create server secrets at ~/supabase_app/deploy/backend.env on the VM (never commit).
-# Copy fields from supabase/backend/.env.example and add production values (LiveKit, Supabase service role, JWT, CORS_ORIGINS=http://YOUR_VM_IP).
+# Copy fields from platform/api/.env.example and add production values (LiveKit, Supabase service role, JWT, CORS_ORIGINS=http://YOUR_VM_IP).
 #
 # GitHub repo secrets:
 #   GCP_VM_HOST          — VM external IP or hostname
@@ -76,10 +76,10 @@ jobs:
             --exclude 'supabase_app/dist' \
             --exclude 'supabase_app/.env' \
             --exclude 'supabase_app/.env.local' \
-            --exclude 'supabase_app/supabase/backend/.env' \
+            --exclude 'supabase_app/platform/api/.env' \
             --exclude 'supabase_app/deploy/backend.env' \
-            --exclude 'supabase_app/supabase/backend/.venv' \
-            --exclude 'supabase_app/supabase/backend/__pycache__' \
+            --exclude 'supabase_app/platform/api/.venv' \
+            --exclude 'supabase_app/platform/api/__pycache__' \
             supabase_app \
             | $SSH "$REMOTE" "mkdir -p ~/supabase_app && tar -xzf - -C ~"
 
