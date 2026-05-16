@@ -106,6 +106,19 @@ jobs:
 
           echo "Rebuilding Docker stack on VM..."
           ssh $SSH_OPTS "$REMOTE" "set -euo pipefail
+          echo '=== Disk before cleanup ==='
+          df -h / || true
+          docker system df 2>/dev/null || true
+          # Free space from old build cache and unused images (keeps running containers)
+          docker builder prune -af 2>/dev/null || true
+          docker image prune -af 2>/dev/null || true
+          echo '=== Disk after cleanup ==='
+          df -h / || true
+          avail=\$(df -k / | awk 'NR==2 {print \$4}')
+          if [ \"\${avail:-0}\" -lt 2097152 ]; then
+            echo 'ERROR: Less than 2GB free on /. Run: docker system prune -af; or resize the GCP boot disk.'
+            exit 1
+          fi
           cd ~/supabase_app/deploy
           docker compose --env-file .deploy-build.env up -d --build
           rm -f .deploy-build.env"
