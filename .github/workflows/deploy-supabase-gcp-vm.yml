@@ -56,28 +56,38 @@ jobs:
             echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-}"
           } > .deploy-build.env
 
-      - name: Load deploy SSH key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.GCP_VM_SSH_PRIVATE_KEY }}
-
       - name: Sync app to VM and restart stack
         env:
           GCP_VM_HOST: ${{ secrets.GCP_VM_HOST }}
           GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
+          GCP_VM_SSH_PRIVATE_KEY: ${{ secrets.GCP_VM_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" \
-            || { echo "Missing GCP_VM_HOST or GCP_VM_USER secrets"; exit 1; }
+          test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" && test -n "${GCP_VM_SSH_PRIVATE_KEY:-}" \
+            || { echo "Missing GCP_VM_HOST, GCP_VM_USER, or GCP_VM_SSH_PRIVATE_KEY"; exit 1; }
+
+          mkdir -p ~/.ssh
+          KEY_FILE=~/.ssh/gcp_deploy
+          # Same as local: ssh -i ./github-deploy-care USER@HOST (strip CRLF if secret was pasted from Windows)
+          printf '%s\n' "$GCP_VM_SSH_PRIVATE_KEY" | tr -d '\r' > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+
+          if ! ssh-keygen -y -f "$KEY_FILE" >/dev/null 2>&1; then
+            echo "::error::GCP_VM_SSH_PRIVATE_KEY is not a valid private key (check newlines / BEGIN-END lines)."
+            exit 1
+          fi
+          echo "Deploy key fingerprint (must match: ssh-keygen -lf ./github-deploy-care.pub on your laptop):"
+          ssh-keygen -lf "$KEY_FILE"
 
           REMOTE="${GCP_VM_USER}@${GCP_VM_HOST}"
-          SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=20 -o ServerAliveInterval=15 -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes"
+          echo "Connecting to ${REMOTE} (GCP_VM_USER and GCP_VM_HOST must match your working ssh command)"
+          SSH_OPTS="-i ${KEY_FILE} -o BatchMode=yes -o ConnectTimeout=20 -o ServerAliveInterval=15 -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes"
 
           ssh-keyscan -H "$GCP_VM_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-          echo "Checking SSH to ${REMOTE}..."
+          echo "Checking SSH..."
           if ! ssh $SSH_OPTS "$REMOTE" 'echo "SSH OK — $(whoami)@$(hostname)"'; then
-            echo "::error::SSH authentication failed. Update GCP_VM_SSH_PRIVATE_KEY and the matching public key in ~/.ssh/authorized_keys on the VM. See workflow header comments."
+            echo "::error::SSH failed for ${REMOTE}. Fix GitHub secrets: GCP_VM_USER=genaiforgex, GCP_VM_HOST=35.207.226.82, GCP_VM_SSH_PRIVATE_KEY=contents of github-deploy-care (not .pub)."
             exit 255
           fi
 
