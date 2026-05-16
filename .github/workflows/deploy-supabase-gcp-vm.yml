@@ -66,10 +66,13 @@ jobs:
           test -n "${GCP_VM_HOST:-}" && test -n "${GCP_VM_USER:-}" && test -n "${GCP_VM_SSH_PRIVATE_KEY:-}" \
             || { echo "Missing GCP_VM_HOST, GCP_VM_USER, or GCP_VM_SSH_PRIVATE_KEY"; exit 1; }
 
+          GCP_VM_HOST="$(printf '%s' "$GCP_VM_HOST" | tr -d '[:space:]')"
+          GCP_VM_USER="$(printf '%s' "$GCP_VM_USER" | tr -d '[:space:]')"
+          echo "GCP_VM_USER length=${#GCP_VM_USER} GCP_VM_HOST length=${#GCP_VM_HOST}"
+
           mkdir -p ~/.ssh
           KEY_FILE=~/.ssh/gcp_deploy
-          # Same as local: ssh -i ./github-deploy-care USER@HOST (strip CRLF if secret was pasted from Windows)
-          printf '%s\n' "$GCP_VM_SSH_PRIVATE_KEY" | tr -d '\r' > "$KEY_FILE"
+          printf '%s' "$GCP_VM_SSH_PRIVATE_KEY" | tr -d '\r' > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
 
           if ! ssh-keygen -y -f "$KEY_FILE" >/dev/null 2>&1; then
@@ -87,7 +90,13 @@ jobs:
 
           echo "Checking SSH..."
           if ! ssh $SSH_OPTS "$REMOTE" 'echo "SSH OK — $(whoami)@$(hostname)"'; then
-            echo "::error::SSH failed for ${REMOTE}. Fix GitHub secrets: GCP_VM_USER=genaiforgex, GCP_VM_HOST=35.207.226.82, GCP_VM_SSH_PRIVATE_KEY=contents of github-deploy-care (not .pub)."
+            echo "::group::SSH debug (last 40 lines)"
+            ssh -vvv $SSH_OPTS "$REMOTE" 'true' 2>&1 | tail -40 || true
+            echo "::endgroup::"
+            echo "::error::SSH failed for ${REMOTE}."
+            echo "1) On laptop run: ssh-keygen -lf ./github-deploy-care.pub — fingerprint must match CI above."
+            echo "2) GitHub secrets: GCP_VM_USER=genaiforgex, GCP_VM_HOST=35.207.226.82, private key=file github-deploy-care."
+            echo "3) On VM: grep -v '^#' ~/.ssh/authorized_keys | grep -v 'from=' | grep github-actions || fix 'from=' IP lock on deploy key."
             exit 255
           fi
 
